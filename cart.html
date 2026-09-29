@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Оформление заказа — GERMANAUTO</title>
+    <style>
+        /* Общие надежные стили */
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; transition: all 0.2s ease; }
+        
+        body { 
+            background-color: #06080c; 
+            color: #f8fafc; 
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Шапка сайта */
+        header { 
+            background: #0b0f17;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06); 
+            width: 100%;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .header-container { max-w: 1300px; margin: 0 auto; padding: 0 24px; height: 72px; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 900; color: #ffffff; text-transform: uppercase; letter-spacing: 0.05em; text-decoration: none; }
+        .logo span { color: #dc2626; }
+
+        /* Контентная область */
+        .main-container { 
+            width: 100%;
+            max-width: 1300px; 
+            margin: 0 auto; 
+            padding: 40px 24px 100px 24px; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 24px;
+        }
+
+        .page-title { font-size: 24px; font-weight: 800; color: white; }
+
+        .checkout-layout { 
+            display: grid; 
+            grid-template-columns: 1fr; 
+            gap: 24px; 
+        }
+        @media (min-width: 1024px) { 
+            .checkout-layout { grid-template-columns: 2fr 1fr; } 
+        }
+
+        .checkout-section { 
+            background: #0b101a; 
+            border: 1px solid rgba(255, 255, 255, 0.06); 
+            border-radius: 20px; 
+            padding: 24px; 
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .section-title { font-size: 11px; font-weight: 700; text-transform: uppercase; color: #64748b; letter-spacing: 0.05em; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 10px; }
+
+        /* Элементы корзины */
+        .cart-item { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 16px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
+        .cart-item:last-child { border-bottom: none; }
+        .item-info { display: flex; align-items: center; gap: 16px; }
+        .item-icon-box { font-size: 24px; width: 44px; height: 44px; background: #131926; border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+        .item-details h4 { font-size: 14px; font-weight: 700; color: white; }
+        .item-details p { font-size: 11px; color: #475569; font-family: monospace; margin-top: 2px; }
+        
+        .item-meta { display: flex; align-items: center; gap: 20px; }
+        .item-price { font-size: 15px; font-weight: 800; color: white; }
+        .btn-delete { background: transparent; border: none; color: #64748b; cursor: pointer; font-size: 14px; }
+        .btn-delete:hover { color: #dc2626; }
+
+        /* Сетка доставки */
+        .delivery-grid { display: grid; grid-template-columns: repeat(1, 1fr); gap: 12px; }
+        @media (min-width: 640px) { .delivery-grid { grid-template-columns: repeat(3, 1fr); } }
+        .delivery-card { background: #131926; border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 16px; cursor: pointer; display: flex; flex-direction: column; gap: 6px; position: relative; }
+        .delivery-card input { position: absolute; top: 16px; right: 16px; accent-color: #dc2626; }
+        .delivery-card.active { border-color: #dc2626; background: rgba(220, 38, 38, 0.02); }
+        .delivery-name { font-size: 13px; font-weight: 700; color: white; }
+        .delivery-sub { font-size: 11px; color: #64748b; }
+
+        /* Поля ввода данных */
+        .form-grid { display: grid; grid-template-columns: 1fr; gap: 16px; }
+        @media (min-width: 640px) { .form-grid { grid-template-columns: 1fr 1fr; } }
+        .input-field { background: #131926; border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 14px; color: white; font-size: 13px; outline: none; width: 100%; }
+        .input-field:focus { border-color: #dc2626; }
+
+        /* Итоговый сайдбар */
+        .summary-card { background: #0b101a; border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 20px; padding: 24px; height: fit-content; display: flex; flex-direction: column; gap: 16px; position: sticky; top: 96px; }
+        .summary-row { display: flex; justify-content: space-between; font-size: 13px; color: #94a3b8; }
+        .summary-total { display: flex; justify-content: space-between; font-size: 15px; font-weight: 800; color: white; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 12px; margin-top: 4px; }
+        .total-price { color: #dc2626; font-size: 20px; font-weight: 900; }
+        
+        .btn-order { background: #dc2626; color: white; border: none; border-radius: 12px; padding: 14px; font-weight: 700; font-size: 14px; cursor: pointer; text-align: center; margin-top: 8px; }
+        .btn-order:hover { background: #b91c1c; }
+
+        /* Мобильная навигация */
+        .bar-mobile { position: fixed; bottom: 0; left: 0; right: 0; height: 60px; background: rgba(10, 15, 26, 0.95); backdrop-filter: blur(20px); border-top: 1px solid rgba(255, 255, 255, 0.05); display: flex; justify-content: space-around; align-items: center; z-index: 100; }
+        @media (min-width: 768px) { .bar-mobile { display: none; } }
+        .tab-link { display: flex; flex-direction: column; align-items: center; font-size: 10px; font-weight: 600; color: #64748b; gap: 2px; text-decoration: none; }
+        .tab-link.active { color: #dc2626; }
+    </style>
+</head>
+<body>
+
+    <!-- НАВИГАЦИЯ -->
+    <header>
+        <div class="header-container">
+            <a href="index.html" class="logo"><span>German</span>Auto</a>
+            <a href="catalog.html" style="color:#94a3b8; font-size:13px; text-decoration:none;">← Вернуться в каталог</a>
+        </div>
+    </header>
+
+    <!-- ОСНОВНОЙ КОНТЕНТ -->
+    <div class="main-container">
+        <h1 class="page-title">Оформление заказа</h1>
+
+        <div class="checkout-layout">
+            
+            <!-- Левая колонка формы -->
+            <div style="display: flex; flex-direction: column; gap: 24px;">
+                
+                <!-- Товары, которые загружаются динамически -->
+                <div class="checkout-section">
+                    <h3 class="section-title">01. Выбранные автокомпоненты</h3>
+                    <div id="cart-items-container">
+                        <!-- Сюда JS выведет список добавленных тобой товаров -->
+                    </div>
+                </div>
+
+                <!-- Выбор логистики получения -->
+                <div class="checkout-section">
+                    <h3 class="section-title">02. Вариант получения и контакты</h3>
+                    
+                    <div class="delivery-grid">
+                        <label class="delivery-card active">
+                            <input type="radio" name="delType" value="pickup" checked>
+                            <span class="delivery-name">Самовывоз</span>
+                            <span class="delivery-sub">С нашего склада — 0 ₽</span>
+                        </label>
+                        <label class="delivery-card">
+                            <input type="radio" name="delType" value="cdek">
+                            <span class="delivery-name">СДЭК / Почта</span>
+                            <span class="delivery-sub">До филиала — 450 ₽</span>
+                        </label>
+                        <label class="delivery-card">
+                            <input type="radio" name="delType" value="courier">
+                            <span class="delivery-name">Курьер GAP</span>
+                            <span class="delivery-sub">До двери — 600 ₽</span>
+                        </label>
+                    </div>
+
+                    <div class="form-grid">
+                        <input type="text" placeholder="Имя и фамилия получателя *" class="input-field" required>
+                        <input type="tel" placeholder="Контактный телефон *" class="input-field" required>
+                        <input type="text" placeholder="Адрес доставки (не требуется для самовывоза)" class="input-field" id="addressInput" style="grid-column: span 2; opacity: 0.3;" disabled>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Правая колонка: Чек расчета -->
+            <div class="summary-card">
+                <h3 class="section-title">03. Финальный расчет</h3>
+                
+                <div class="summary-row">
+                    <span>Стоимость деталей:</span>
+                    <span id="parts-cost" style="color:white; font-weight:700;">0 ₽</span>
+                </div>
+                <div class="summary-row">
+                    <span>Логистика (Доставка):</span>
+                    <span id="delCostText" style="color:white; font-weight:700;">0 ₽</span>
+                </div>
+                
+                <div class="summary-total">
+                    <span>Итого к оплате:</span>
+                    <span class="total-price" id="totalCostText">0 ₽</span>
+                </div>
+
+                <button class="btn-order" onclick="alert('Заказ успешно сымитирован для демо-версии!')">Подтвердить заказ</button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Мобильное меню -->
+    <div class="bar-mobile">
+        <a href="index.html" class="tab-link"><span>🏠</span><span>Главная</span></a>
+        <a href="catalog.html" class="tab-link"><span>📁</span><span>Каталог</span></a>

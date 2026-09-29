@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GERMANAUTO — Premium Ecosystem</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+        
+        body { 
+            background-color: #06080c; 
+            color: #f8fafc; 
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header { 
+            background: #0b0f17;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06); 
+            width: 100%;
+        }
+        .header-container { 
+            max-w: 1300px; 
+            margin: 0 auto; 
+            padding: 0 24px; 
+            height: 72px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            gap: 24px; 
+        }
+        
+        .logo { font-size: 20px; font-weight: 900; color: #ffffff; text-transform: uppercase; letter-spacing: 0.05em; text-decoration: none; }
+        .logo span { color: #dc2626; }
+
+        .search-wrapper { flex: 1; max-width: 500px; display: none; }
+        @media (min-width: 768px) { .search-wrapper { display: block; } }
+        .search-bar { width: 100%; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 12px 18px; font-size: 13px; color: white; outline: none; }
+        
+        .nav-links { display: none; align-items: center; gap: 24px; font-size: 14px; font-weight: 500; }
+        @media (min-width: 1024px) { .nav-links { display: flex; } }
+        .nav-item { color: #94a3b8; cursor: pointer; text-decoration: none; }
+        .cart-count { background: #dc2626; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 20px; color: white; }
+        
+        .btn-auth { background: #ffffff; color: #06080c; padding: 10px 20px; border-radius: 12px; font-size: 13px; font-weight: 700; border: none; cursor: pointer; }
+
+        .main-container { 
+            width: 100%;
+            max-width: 1300px; 
+            margin: 0 auto; 
+            padding: 40px 24px 100px 24px; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 40px;
+        }
+
+        .hero-block { display: flex; flex-direction: column; gap: 14px; max-width: 750px; }
+        .hero-tag { align-self: flex-start; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #dc2626; background: rgba(220, 38, 38, 0.08); padding: 6px 12px; border-radius: 30px; border: 1px solid rgba(220, 38, 38, 0.15); }
+        .hero-title { font-size: 36px; font-weight: 900; line-height: 1.2; color: #ffffff; }
+        @media (min-width: 768px) { .hero-title { font-size: 44px; } }
+        .hero-desc { font-size: 15px; color: #94a3b8; line-height: 1.6; }
+
+        .tabs-area { display: flex; gap: 6px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 6px; border-radius: 14px; width: fit-content; margin-bottom: 16px; }
+        .tab-button { background: transparent; border: none; color: #94a3b8; padding: 10px 16px; font-size: 13px; font-weight: 600; border-radius: 10px; cursor: pointer; }
+        .tab-button.active { background: rgba(255,255,255,0.06); color: #ffffff; border: 1px solid rgba(255,255,255,0.05); }
+
+        .search-panel { 
+            background: #0b101a;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 20px;
+            padding: 24px;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+        @media (min-width: 768px) { .search-panel { grid-template-columns: repeat(2, 1fr); } }
+        @media (min-width: 1024px) { .search-panel { grid-template-columns: repeat(4, 1fr); } }
+
+        .control-group { display: flex; flex-direction: column; gap: 8px; justify-content: center; }
+        .control-group label { font-size: 11px; font-weight: 700; text-transform: uppercase; color: #475569; letter-spacing: 0.05em; }
+        
+        .select-element, .input-element { 
+            background: #131926; 
+            border: 1px solid rgba(255,255,255,0.06); 
+            border-radius: 12px; 
+            padding: 14px; 
+            color: #f8fafc; 
+            font-size: 14px; 
+            outline: none;
+            width: 100%;
+        }
+        .select-element:disabled { opacity: 0.2; cursor: not-allowed; }
+
+        .action-btn { 
+            background: #dc2626; 
+            color: white; 
+            font-weight: 700; 
+            font-size: 14px; 
+            border: none; 
+            border-radius: 12px; 
+            padding: 14px; 
+            cursor: pointer; 
+            width: 100%;
+        }
+        .action-btn:hover { background: #b91c1c; }
+
+        .categories-section { display: flex; flex-direction: column; gap: 20px; }
+        .section-bar { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 12px; }
+        .section-bar h2 { font-size: 20px; font-weight: 800; color: #ffffff; }
+        .section-bar a { font-size: 13px; color: #dc2626; font-weight: 600; text-decoration: none; }
+
+        .cards-container { display: grid; grid-template-columns: 1fr; gap: 16px; }
+        @media (min-width: 640px) { .cards-container { grid-template-columns: repeat(2, 1fr); } }
+        @media (min-width: 1024px) { .cards-container { grid-template-columns: repeat(3, 1fr); } }
+
+        .category-item { 
+            background: #0b101a; 
+            border: 1px solid rgba(255, 255, 255, 0.04); 
+            border-radius: 16px; 
+            padding: 20px; 
+            display: flex; 
+            align-items: center; 
+            gap: 16px; 
+            text-decoration: none;
+            color: inherit;
+        }
+        .category-item:hover { background: #131926; border-color: rgba(255,255,255,0.1); }
+        .icon-shape { font-size: 24px; }
+        .info-shape h3 { font-size: 15px; font-weight: 700; color: #ffffff; margin-bottom: 2px; }
+        .info-shape p { font-size: 12px; color: #64748b; }
+    </style>
+</head>
+<body>
+
+    <!-- НАВИГАЦИЯ -->
+    <header>
+        <div class="header-container">
+            <a href="index.html" class="logo"><span>German</span>Auto</a>
+            <div class="search-wrapper">
+                <input type="text" placeholder="Поиск по артикулу..." class="search-bar">
+            </div>
+            <div class="nav-links">
+                <span class="nav-item">🚗 Гараж</span>
+                <a href="cart.html" class="nav-item">🛒 Корзина <span class="cart-count">2</span></a>
+                <button class="btn-auth">Войти</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- ОСНОВНОЙ КОНТЕНТ -->
+    <div class="main-container">
+        
+        <div class="hero-block">
+            <span class="hero-tag">Premium Ecosystem</span>
+            <h1 class="hero-title">Экосистема запчастей для немецких авто</h1>
+            <p class="hero-desc">Выберите параметры вашей машины или введите VIN-код. Система мгновенно подберет совместимые оригинальные комплектующие и проверенные аналоги с гарантией.</p>
+        </div>
+
+        <div>
+            <div class="tabs-area">
+                <button class="tab-button active" id="tabAutoBtn">Подбор по автомобилю</button>
+                <button class="tab-button" id="tabVinBtn">Поиск по VIN</button>
+            </div>
+
+            <!-- БЛОК ПОДБОРА С ИСПРАВЛЕННЫМИ ID ДЛЯ СКРИПТА -->
+            <div class="search-panel" id="panelAuto">
+                <div class="control-group">
+                    <label>01. Марка</label>
+                    <select id="makeSelect" class="select-element">
+                        <option value="">Выбрать Марку</option>
+                        <option value="Audi">Audi</option>
+                        <option value="BMW">BMW</option>
+                        <option value="Mercedes-Benz">Mercedes-Benz</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label>02. Модель</label>
+                    <select id="modelSelect" class="select-element" disabled>
+                        <option value="">Выбрать Модель</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label>03. Год / Кузов</label>
+                    <select id="genSelect" class="select-element" disabled>
+                        <option value="">Год / Кузов</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <button id="searchBtn" class="action-btn">Открыть каталог</button>
+                </div>
+            </div>
+
+            <div class="search-panel" id="panelVin" style="display: none; grid-template-columns: 3fr 1fr;">
+                <div class="control-group">
+                    <label>Введите 17 знаков VIN-кода</label>
+                    <input type="text" placeholder="Например: WBAАЗ510X0L..." class="input-element">
+                </div>
+                <div class="control-group">
+                    <button class="action-btn" onclick="window.location.href='catalog.html'">Найти</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="categories-section">
+            <div class="section-bar">
+                <h2>Популярные узлы автомобиля</h2>
+                <a href="catalog.html">Весь каталог →</a>
+            </div>
+
+            <div class="cards-container">
+                <a href="catalog.html" class="category-item">
+                    <div class="icon-shape">⚙️</div>
+                    <div class="info-shape">
+                        <h3>Двигатель и ГРМ</h3>
+                        <p>Поршни, ремни, комплекты цепей, прокладки</p>

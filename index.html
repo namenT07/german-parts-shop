@@ -1,216 +1,279 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GERMANAUTO — Premium Ecosystem</title>
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
-        
-        body { 
-            background-color: #06080c; 
-            color: #f8fafc; 
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        header { 
-            background: #0b0f17;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.06); 
-            width: 100%;
-        }
-        .header-container { 
-            max-w: 1300px; 
-            margin: 0 auto; 
-            padding: 0 24px; 
-            height: 72px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            gap: 24px; 
-        }
-        
-        .logo { font-size: 20px; font-weight: 900; color: #ffffff; text-transform: uppercase; letter-spacing: 0.05em; text-decoration: none; }
-        .logo span { color: #dc2626; }
-
-        .search-wrapper { flex: 1; max-width: 500px; display: none; }
-        @media (min-width: 768px) { .search-wrapper { display: block; } }
-        .search-bar { width: 100%; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 12px 18px; font-size: 13px; color: white; outline: none; }
-        
-        .nav-links { display: none; align-items: center; gap: 24px; font-size: 14px; font-weight: 500; }
-        @media (min-width: 1024px) { .nav-links { display: flex; } }
-        .nav-item { color: #94a3b8; cursor: pointer; text-decoration: none; }
-        .cart-count { background: #dc2626; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 20px; color: white; }
-        
-        .btn-auth { background: #ffffff; color: #06080c; padding: 10px 20px; border-radius: 12px; font-size: 13px; font-weight: 700; border: none; cursor: pointer; }
-
-        .main-container { 
-            width: 100%;
-            max-width: 1300px; 
-            margin: 0 auto; 
-            padding: 40px 24px 100px 24px; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 40px;
-        }
-
-        .hero-block { display: flex; flex-direction: column; gap: 14px; max-width: 750px; }
-        .hero-tag { align-self: flex-start; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #dc2626; background: rgba(220, 38, 38, 0.08); padding: 6px 12px; border-radius: 30px; border: 1px solid rgba(220, 38, 38, 0.15); }
-        .hero-title { font-size: 36px; font-weight: 900; line-height: 1.2; color: #ffffff; }
-        @media (min-width: 768px) { .hero-title { font-size: 44px; } }
-        .hero-desc { font-size: 15px; color: #94a3b8; line-height: 1.6; }
-
-        .tabs-area { display: flex; gap: 6px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 6px; border-radius: 14px; width: fit-content; margin-bottom: 16px; }
-        .tab-button { background: transparent; border: none; color: #94a3b8; padding: 10px 16px; font-size: 13px; font-weight: 600; border-radius: 10px; cursor: pointer; }
-        .tab-button.active { background: rgba(255,255,255,0.06); color: #ffffff; border: 1px solid rgba(255,255,255,0.05); }
-
-        .search-panel { 
-            background: #0b101a;
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            border-radius: 20px;
-            padding: 24px;
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 20px;
-        }
-        @media (min-width: 768px) { .search-panel { grid-template-columns: repeat(2, 1fr); } }
-        @media (min-width: 1024px) { .search-panel { grid-template-columns: repeat(4, 1fr); } }
-
-        .control-group { display: flex; flex-direction: column; gap: 8px; justify-content: center; }
-        .control-group label { font-size: 11px; font-weight: 700; text-transform: uppercase; color: #475569; letter-spacing: 0.05em; }
-        
-        .select-element, .input-element { 
-            background: #131926; 
-            border: 1px solid rgba(255,255,255,0.06); 
-            border-radius: 12px; 
-            padding: 14px; 
-            color: #f8fafc; 
-            font-size: 14px; 
-            outline: none;
-            width: 100%;
-        }
-        .select-element:disabled { opacity: 0.2; cursor: not-allowed; }
-
-        .action-btn { 
-            background: #dc2626; 
-            color: white; 
-            font-weight: 700; 
-            font-size: 14px; 
-            border: none; 
-            border-radius: 12px; 
-            padding: 14px; 
-            cursor: pointer; 
-            width: 100%;
-        }
-        .action-btn:hover { background: #b91c1c; }
-
-        .categories-section { display: flex; flex-direction: column; gap: 20px; }
-        .section-bar { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 12px; }
-        .section-bar h2 { font-size: 20px; font-weight: 800; color: #ffffff; }
-        .section-bar a { font-size: 13px; color: #dc2626; font-weight: 600; text-decoration: none; }
-
-        .cards-container { display: grid; grid-template-columns: 1fr; gap: 16px; }
-        @media (min-width: 640px) { .cards-container { grid-template-columns: repeat(2, 1fr); } }
-        @media (min-width: 1024px) { .cards-container { grid-template-columns: repeat(3, 1fr); } }
-
-        .category-item { 
-            background: #0b101a; 
-            border: 1px solid rgba(255, 255, 255, 0.04); 
-            border-radius: 16px; 
-            padding: 20px; 
-            display: flex; 
-            align-items: center; 
-            gap: 16px; 
-            text-decoration: none;
-            color: inherit;
-        }
-        .category-item:hover { background: #131926; border-color: rgba(255,255,255,0.1); }
-        .icon-shape { font-size: 24px; }
-        .info-shape h3 { font-size: 15px; font-weight: 700; color: #ffffff; margin-bottom: 2px; }
-        .info-shape p { font-size: 12px; color: #64748b; }
-    </style>
+    <title>GERMANAUTO — Премиальная экосистема запчастей для немецких авто</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
-    <!-- НАВИГАЦИЯ -->
+    <!-- НАВИГАЦИОННАЯ ШАПКА -->
     <header>
         <div class="header-container">
-            <a href="index.html" class="logo"><span>German</span>Auto</a>
-            <div class="search-wrapper">
-                <input type="text" placeholder="Поиск по артикулу..." class="search-bar">
+            <a href="index.html" class="logo">
+                <span>German</span>Auto
+                <span class="logo-badge">PRO</span>
+            </a>
+
+            <div class="header-search">
+                <span class="header-search-icon">🔍</span>
+                <input type="text" placeholder="Поиск по артикулу, названию или бренду..." class="header-search-input">
             </div>
-            <div class="nav-links">
-                <span class="nav-item">🚗 Гараж</span>
-                <a href="cart.html" class="nav-item">🛒 Корзина <span class="cart-count">2</span></a>
-                <button class="btn-auth">Войти</button>
+
+            <div class="nav-actions">
+                <a href="index.html" class="nav-link active">🏠 Главная</a>
+                <a href="catalog.html" class="nav-link">📁 Каталог</a>
+
+                <button class="theme-toggle-btn" onclick="toggleTheme()" title="Переключить тему">☀️</button>
+
+                <a href="cart.html" class="cart-nav-btn">
+                    <span>🛒 Корзина</span>
+                    <span class="cart-badge">0</span>
+                </a>
             </div>
         </div>
     </header>
 
     <!-- ОСНОВНОЙ КОНТЕНТ -->
-    <div class="main-container">
-        
-        <div class="hero-block">
-            <span class="hero-tag">Premium Ecosystem</span>
-            <h1 class="hero-title">Экосистема запчастей для немецких авто</h1>
-            <p class="hero-desc">Выберите параметры вашей машины или введите VIN-код. Система мгновенно подберет совместимые оригинальные комплектующие и проверенные аналоги с гарантией.</p>
-        </div>
+    <main class="main-container">
 
-        <div>
-            <div class="tabs-area">
-                <button class="tab-button active" id="tabAutoBtn">Подбор по автомобилю</button>
-                <button class="tab-button" id="tabVinBtn">Поиск по VIN</button>
-            </div>
+        <!-- HERO БЛОК -->
+        <section class="hero-wrapper">
+            <div class="hero-block">
+                <span class="hero-tag">✨ Премиальная экосистема немецкого автопрома</span>
+                <h1 class="hero-title">Оригинальные запчасти и аналоги для <span>Audi, BMW, Mercedes</span></h1>
+                <p class="hero-desc">
+                    Мгновенный подбор по VIN-коду или модели автомобиля. Гарантия полной совместимости, дилерское качество компонентов и доставка день в день по всей России.
+                </p>
 
-            <!-- БЛОК ПОДБОРА С ИСПРАВЛЕННЫМИ ID ДЛЯ СКРИПТА -->
-            <div class="search-panel" id="panelAuto">
-                <div class="control-group">
-                    <label>01. Марка</label>
-                    <select id="makeSelect" class="select-element">
-                        <option value="">Выбрать Марку</option>
-                        <option value="Audi">Audi</option>
-                        <option value="BMW">BMW</option>
-                        <option value="Mercedes-Benz">Mercedes-Benz</option>
-                    </select>
-                </div>
-                <div class="control-group">
-                    <label>02. Модель</label>
-                    <select id="modelSelect" class="select-element" disabled>
-                        <option value="">Выбрать Модель</option>
-                    </select>
-                </div>
-                <div class="control-group">
-                    <label>03. Год / Кузов</label>
-                    <select id="genSelect" class="select-element" disabled>
-                        <option value="">Год / Кузов</option>
-                    </select>
-                </div>
-                <div class="control-group">
-                    <button id="searchBtn" class="action-btn">Открыть каталог</button>
+                <!-- Доверительные показатели -->
+                <div class="trust-grid">
+                    <div class="trust-item">
+                        <span class="trust-val">100%</span>
+                        <span class="trust-lbl">Оригиналы & OEM</span>
+                    </div>
+                    <div class="trust-item">
+                        <span class="trust-val">25 000+</span>
+                        <span class="trust-lbl">Деталей на складе</span>
+                    </div>
+                    <div class="trust-item">
+                        <span class="trust-val">24 мес.</span>
+                        <span class="trust-lbl">Официальная гарантия</span>
+                    </div>
+                    <div class="trust-item">
+                        <span class="trust-val">1 день</span>
+                        <span class="trust-lbl">Экспресс-доставка</span>
+                    </div>
                 </div>
             </div>
 
-            <div class="search-panel" id="panelVin" style="display: none; grid-template-columns: 3fr 1fr;">
-                <div class="control-group">
-                    <label>Введите 17 знаков VIN-кода</label>
-                    <input type="text" placeholder="Например: WBAАЗ510X0L..." class="input-element">
+            <!-- ИНТЕРАКТИВНЫЙ ВИДЖЕТ ПОДБОРА -->
+            <div class="search-widget">
+                <div class="tabs-header">
+                    <button class="tab-btn active" id="tabAutoBtn">Подбор по авто</button>
+                    <button class="tab-btn" id="tabVinBtn">Поиск по VIN</button>
                 </div>
-                <div class="control-group">
-                    <button class="action-btn" onclick="window.location.href='catalog.html'">Найти</button>
+
+                <!-- Панель по автомобилю -->
+                <div class="selector-panel" id="panelAuto">
+                    <div class="control-group">
+                        <label class="control-label">01. Марка</label>
+                        <div class="select-wrapper">
+                            <select id="makeSelect" class="select-custom">
+                                <option value="">Выбрать Марку</option>
+                                <option value="Audi">Audi</option>
+                                <option value="BMW">BMW</option>
+                                <option value="Mercedes-Benz">Mercedes-Benz</option>
+                                <option value="Porsche">Porsche</option>
+                                <option value="Volkswagen">Volkswagen</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label class="control-label">02. Модель</label>
+                        <div class="select-wrapper">
+                            <select id="modelSelect" class="select-custom" disabled>
+                                <option value="">Сначала выберите марку</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label class="control-label">03. Год / Кузов</label>
+                        <div class="select-wrapper">
+                            <select id="genSelect" class="select-custom" disabled>
+                                <option value="">Год / Поколение</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label class="control-label">&nbsp;</label>
+                        <button id="searchBtn" class="btn-primary">
+                            <span>Открыть каталог</span> →
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Панель по VIN -->
+                <div class="selector-panel" id="panelVin" style="display: none; grid-template-columns: 1fr auto;">
+                    <div class="control-group">
+                        <label class="control-label">Введите 17 символов VIN-кода кузова</label>
+                        <input type="text" placeholder="Например: WBA3A510X0L123456" class="input-custom" maxlength="17">
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">&nbsp;</label>
+                        <button class="btn-primary" onclick="window.location.href='catalog.html'">
+                            <span>Найти по VIN</span> 🔍
+                        </button>
+                    </div>
                 </div>
             </div>
-        </div>
+        </section>
 
-        <div class="categories-section">
-            <div class="section-bar">
-                <h2>Популярные узлы автомобиля</h2>
-                <a href="catalog.html">Весь каталог →</a>
+        <!-- ПОПУЛЯРНЫЕ КАТЕГОРИИ -->
+        <section>
+            <div class="section-header">
+                <h2 class="section-title">Категории запчастей</h2>
+                <a href="catalog.html" class="section-link">Смотреть весь каталог →</a>
             </div>
 
-            <div class="cards-container">
-                <a href="catalog.html" class="category-item">
-                    <div class="icon-shape">⚙️</div>
-                    <div class="info-shape">
+            <div class="categories-grid">
+                <a href="catalog.html" class="category-card">
+                    <div class="category-icon">⚙️</div>
+                    <div class="category-info">
                         <h3>Двигатель и ГРМ</h3>
-                        <p>Поршни, ремни, комплекты цепей, прокладки</p>
+                        <p>Цепи, ремни, поршни, клапаны и прокладки</p>
+                    </div>
+                </a>
+
+                <a href="catalog.html" class="category-card">
+                    <div class="category-icon">💿</div>
+                    <div class="category-info">
+                        <h3>Тормозная система</h3>
+                        <p>Диски, керамоколодки, суппорты и датчики</p>
+                    </div>
+                </a>
+
+                <a href="catalog.html" class="category-card">
+                    <div class="category-icon">🛞</div>
+                    <div class="category-info">
+                        <h3>Подвеска и рулевое</h3>
+                        <p>Амортизаторы, рычаги, сайлентблоки</p>
+                    </div>
+                </a>
+
+                <a href="catalog.html" class="category-card">
+                    <div class="category-icon">🛢️</div>
+                    <div class="category-info">
+                        <h3>Фильтры и Масла</h3>
+                        <p>Масляные, воздушные, салонные и масляные составы</p>
+                    </div>
+                </a>
+
+                <a href="catalog.html" class="category-card">
+                    <div class="category-icon">💡</div>
+                    <div class="category-info">
+                        <h3>Оптика и Освещение</h3>
+                        <p>Adaptive LED, Laser headlights, блочные модули</p>
+                    </div>
+                </a>
+
+                <a href="catalog.html" class="category-card">
+                    <div class="category-icon">🔌</div>
+                    <div class="category-info">
+                        <h3>Электроника и Датчики</h3>
+                        <p>Датчики ABS, блоки управления, свечи зажигания</p>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+        <!-- РЕКОМЕНДУЕМЫЕ ТОВАРЫ / БЕСТСЕЛЛЕРЫ -->
+        <section>
+            <div class="section-header">
+                <div>
+                    <h2 class="section-title">Хиты продаж и оригинальные комплектующие</h2>
+                    <p style="font-size:13px; color:var(--text-muted); margin-top:4px;">Детали с максимальным рейтингом и гарантией совместимости</p>
+                </div>
+                <a href="catalog.html" class="section-link">Все предложения →</a>
+            </div>
+
+            <div class="products-grid" id="featured-products-grid">
+                <!-- Заполняется динамически из app.js -->
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ПОДВАЛ САЙТА -->
+    <footer>
+        <div class="footer-container">
+            <div class="footer-brand">
+                <a href="index.html" class="logo"><span>German</span>Auto</a>
+                <p class="footer-desc">
+                    Флагманская онлайн-платформа подбора и поставки премиальных автокомпонентов для автомобилей Audi, BMW, Mercedes-Benz, Porsche и Volkswagen.
+                </p>
+            </div>
+
+            <div class="footer-col">
+                <h4>Каталог</h4>
+                <ul>
+                    <li><a href="catalog.html">Двигатель и ГРМ</a></li>
+                    <li><a href="catalog.html">Тормозные системы</a></li>
+                    <li><a href="catalog.html">Подвеска M-Performance</a></li>
+                    <li><a href="catalog.html">Оригинальные масла OEM</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>Сервис</h4>
+                <ul>
+                    <li><a href="#">Проверка по VIN-коду</a></li>
+                    <li><a href="#">Доставка и Оплата</a></li>
+                    <li><a href="#">Гарантия и Возврат</a></li>
+                    <li><a href="#">Партнерская программа</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>Контакты</h4>
+                <ul>
+                    <li><a href="tel:88005553535">📞 8 (800) 555-35-35</a></li>
+                    <li><a href="mailto:support@germanauto.pro">✉️ support@germanauto.pro</a></li>
+                    <li><span style="font-size:13px; color:var(--text-muted);">📍 г. Москва, ул. Автозаводская, д. 18</span></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <span>© 2025 GERMANAUTO PRO. Все права защищены.</span>
+            <span>Премиальный сервис подбора запчастей для немецких автомобилей</span>
+        </div>
+    </footer>
+
+    <!-- МОБИЛЬНАЯ ПАНЕЛЬ НАВИГАЦИИ -->
+    <nav class="mobile-nav-bar">
+        <a href="index.html" class="mobile-tab-item active">
+            <span class="mobile-tab-icon">🏠</span>
+            <span>Главная</span>
+        </a>
+        <a href="catalog.html" class="mobile-tab-item">
+            <span class="mobile-tab-icon">📁</span>
+            <span>Каталог</span>
+        </a>
+        <a href="cart.html" class="mobile-tab-item">
+            <span class="mobile-tab-icon">🛒</span>
+            <span>Корзина</span>
+        </a>
+        <button class="mobile-tab-item theme-toggle-btn" style="background:none; border:none; padding:0;" onclick="toggleTheme()">
+            <span class="mobile-tab-icon">☀️</span>
+            <span>Тема</span>
+        </button>
+    </nav>
+
+    <script src="app.js"></script>
+</body>
+</html>

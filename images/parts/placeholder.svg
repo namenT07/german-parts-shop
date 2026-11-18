@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-labelledby="phTitle" aria-describedby="phDesc">
+  <title id="phTitle">Generic auto part</title>
+  <desc id="phDesc">Placeholder auto part illustration</desc>
+  <defs>
+    <linearGradient id="phGrad" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#94a3b8"/>
+      <stop offset="100%" stop-color="#475569"/>
+    </linearGradient>
+    <filter id="phShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="6"/>
+      <feOffset dx="0" dy="4" result="offsetblur"/>
+      <feComponentTransfer><feFuncA type="linear" slope="0.35"/></feComponentTransfer>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <circle cx="100" cy="92" r="52" fill="url(#phGrad)" stroke="#334155" stroke-width="2"/>
+  <circle cx="100" cy="92" r="20" fill="#1e293b" stroke="#64748b" stroke-width="1.5"/>
+  <path d="M70 130 l 6 16 l 12 4 l 6 -16 z" fill="#64748b"/>
+  <path d="M130 130 l -6 16 l -12 4 l -6 -16 z" fill="#64748b"/>
+  <rect x="92" y="138" width="16" height="14" rx="3" fill="#475568"/>
+  <circle cx="100" cy="162" r="6" fill="#dc2626"/>
+</svg>

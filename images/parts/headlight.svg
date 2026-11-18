@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-labelledby="lampTitle" aria-describedby="lampDesc">
+  <title id="lampTitle">LED headlight module</title>
+  <desc id="lampDesc">Automotive adaptive LED headlight illustration</desc>
+  <defs>
+    <linearGradient id="lampGrad" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#e2e8f0"/>
+      <stop offset="100%" stop-color="#64748b"/>
+    </linearGradient>
+    <filter id="lampShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="5"/>
+      <feOffset dx="0" dy="6" result="offsetblur"/>
+      <feComponentTransfer><feFuncA type="linear" slope="0.35"/></feComponentTransfer>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <!-- housing -->
+  <path d="M56 74 Q 56 52 90 52 Q 124 52 124 74 L 136 96 Q 142 124 124 124 Q 90 124 76 124 Q 58 124 64 96 Z" fill="url(#lampGrad)" stroke="#1e293b" stroke-width="3" filter="url(#lampShadow)"/>
+  <!-- lens -->
+  <path d="M70 78 Q 70 62 100 62 Q 130 62 130 78 L 130 116 Q 130 118 128 118 Q 100 118 72 118 Q 70 118 70 116 Z" fill="#e2e8f0" stroke="#94a3b8" stroke-width="1.5"/>
+  <!-- reflector & LED -->
+  <ellipse cx="100" cy="98" rx="26" ry="18" fill="#334155"/>
+  <circle cx="100" cy="98" r="8" fill="#dc2626"/>
+  <circle cx="100" cy="98" r="4" fill="#fbbf24"/>
+  <line x1="74" y1="104" x2="126" y2="104" stroke="#cbd5e1" stroke-width="1.5" opacity="0.6"/>
+  <line x1="86" y1="112" x2="114" y2="112" stroke="#cbd5e1" stroke-width="1.5" opacity="0.6"/>
+</svg>

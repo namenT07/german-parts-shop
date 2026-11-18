@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-labelledby="atfTitle" aria-describedby="atfDesc">
+  <title id="atfTitle">ATF transmission fluid</title>
+  <desc id="atfDesc">Automatic transmission fluid bottle illustration</desc>
+  <defs>
+    <linearGradient id="atfGrad" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#e2e8f0"/>
+      <stop offset="100%" stop-color="#64748b"/>
+    </linearGradient>
+    <filter id="atfShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="5"/>
+      <feOffset dx="0" dy="6" result="offsetblur"/>
+      <feComponentTransfer><feFuncA type="linear" slope="0.35"/></feComponentTransfer>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <!-- bottle -->
+  <path d="M64 64 Q 64 52 90 52 Q 116 52 116 64 L 116 148 Q 116 164 100 164 Q 84 164 84 148 Z" fill="url(#atfGrad)" stroke="#334155" stroke-width="2" filter="url(#atfShadow)"/>
+  <rect x="58" y="52" width="84" height="14" rx="4" fill="#475568" stroke="#1e293b" stroke-width="1.5"/>
+  <!-- red fluid -->
+  <path d="M68 72 Q 68 84 90 84 Q 112 84 112 72 L 116 148 Q 116 160 100 160 Q 84 160 84 148 Z" fill="#dc2626" opacity="0.9"/>
+  <path d="M84 84 Q 90 78 96 84 Q 102 78 108 84 Q 102 90 96 90 Q 90 90 84 84 Z" fill="#ffffff" opacity="0.35"/>
+  <rect x="86" y="150" width="28" height="10" rx="3" fill="#1e293b"/>
+</svg>

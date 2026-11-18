@@ -706,12 +706,12 @@ header {
     height: 160px;
     background: var(--bg-elevated);
     border-radius: var(--radius-md);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 48px;
     position: relative;
     overflow: hidden;
+}
+.part-img {
+    width: 100%; height: 100%; object-fit: cover; border-radius: var(--radius-md);
+    display: block;
 }
 
 .badge-tag {
@@ -1659,3 +1659,65 @@ footer {
 .toast-container { z-index: 2000; }
 
 /* VIN modal result already handled inline */
+
+/* ==========================================================================
+   VECTOR ICONS & PART IMAGES
+   ========================================================================== */
+.icon { display: inline-block; vertical-align: middle; }
+.icon--car, .icon--home, .icon--folder, .icon--shopping-cart, .icon--search,
+.icon--sun, .icon--moon, .icon--cog, .icon--disc, .icon--wheel,
+.icon--oil-filter, .icon--lamp, .icon--plug, .icon--building-2,
+.icon--phone, .icon--mail, .icon--map-pin, .icon--alert-triangle,
+.icon--check-circle, .icon--trash-2, .icon--info { width: var(--icon-size, 1em); height: var(--icon-size, 1em); }
+
+.part-img, .cart-img, .sdi-img, .detail-img { object-fit: cover; border-radius: var(--radius-md); display: block; background: var(--bg-elevated); }
+.part-img { width: 100%; height: 100%; }
+.cart-img { width: 100%; height: 100%; }
+.sdi-img { width: 24px; height: 24px; flex-shrink: 0; }
+.detail-img { width: 220px; height: 220px; border-radius: var(--radius-lg); border: 1px solid var(--border-color); }
+
+.search-dropdown-item img { width: 24px; height: 24px; object-fit: cover; border-radius: 6px; flex-shrink: 0; }
+
+/* ==========================================================================
+   HERO 3D X-RAY CAR EXPLORER
+   ========================================================================== */
+.hero-visual {
+    position: relative;
+    min-height: 340px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+}
+@media (min-width: 1024px) { .hero-visual { min-height: 460px; } }
+.hero-visual canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.webgl-fallback { color: var(--text-secondary); text-align: center; }
+.hero3d-tooltip {
+    position: absolute; pointer-events: none; z-index: 60;
+    background: var(--bg-elevated); border: 1px solid var(--border-color);
+    border-left: 4px solid var(--primary); color: var(--text-primary);
+    padding: 10px 14px; border-radius: var(--radius-md); font-size: 13px;
+    box-shadow: var(--shadow-lg); display: none; white-space: nowrap;
+    min-width: 160px; text-align: center;
+}
+.hud-name { font-weight: 800; color: var(--primary); margin-bottom: 2px; }
+.hud-hint { font-size: 11px; color: var(--text-secondary); }
+.hero3d-layers {
+    position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%);
+    display: flex; gap: 8px; z-index: 60;
+    background: var(--bg-glass); padding: 6px;
+    border-radius: var(--radius-full); border: 1px solid var(--border-color);
+    backdrop-filter: blur(8px);
+}
+.hud-btn {
+    background: transparent; border: 1px solid transparent; color: var(--text-secondary);
+    font-size: 12px; font-weight: 700; padding: 6px 14px; border-radius: var(--radius-md);
+    cursor: pointer; transition: var(--transition);
+}
+.hud-btn:hover { color: var(--text-primary); background: var(--bg-elevated); }
+.hud-btn.active { color: var(--primary); border-color: var(--primary); background: var(--primary-subtle); }
+
+@media (max-width: 768px) {
+    .hero-wrapper { grid-template-columns: 1fr !important; }
+    .hero-visual { order: -1; }
+}

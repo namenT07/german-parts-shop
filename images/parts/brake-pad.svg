@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-labelledby="padTitle" aria-describedby="padDesc">
+  <title id="padTitle">Ceramic brake pad</title>
+  <desc id="padDesc">Automotive brake pad with backing plate illustration</desc>
+  <defs>
+    <linearGradient id="padGrad" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#f1f5f9"/>
+      <stop offset="70%" stop-color="#64748b"/>
+      <stop offset="100%" stop-color="#334155"/>
+    </linearGradient>
+    <linearGradient id="plateGrad" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#94a3b8"/>
+      <stop offset="100%" stop-color="#475568"/>
+    </linearGradient>
+    <filter id="padShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="5"/>
+      <feOffset dx="0" dy="6" result="offsetblur"/>
+      <feComponentTransfer><feFuncA type="linear" slope="0.35"/></feComponentTransfer>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <!-- backing plate -->
+  <rect x="68" y="88" width="64" height="88" rx="6" fill="url(#plateGrad)" stroke="#1e293b" stroke-width="2" filter="url(#padShadow)"/>
+  <rect x="74" y="94" width="52" height="8" rx="2" fill="#cbd5e1"/>
+  <rect x="74" y="172" width="52" height="8" rx="2" fill="#cbd5e1"/>
+  <circle cx="94" y="132" r="3" fill="#1e293b"/>
+  <circle cx="106" y="132" r="3" fill="#1e293b"/>
+  <!-- friction material -->
+  <rect x="72" y="96" width="56" height="72" rx="4" fill="url(#padGrad)" stroke="#0f172a" stroke-width="1.5"/>
+  <rect x="78" y="102" width="44" height="10" rx="2" fill="#e2e8f0" opacity="0.6"/>
+  <rect x="78" y="122" width="44" height="10" rx="2" fill="#e2e8f0" opacity="0.6"/>
+  <rect x="78" y="142" width="44" height="10" rx="2" fill="#e2e8f0" opacity="0.6"/>
+  <!-- ceramic red accent -->
+  <path d="M90 108 Q 100 100 110 108 Q 100 116 90 108 Z" fill="#dc2626" opacity="0.85"/>
+</svg>

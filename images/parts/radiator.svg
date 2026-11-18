@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-labelledby="radTitle" aria-describedby="radDesc">
+  <title id="radTitle">Radiator &amp; cooling</title>
+  <desc id="radDesc">Automotive radiator core with end tanks illustration</desc>
+  <defs>
+    <linearGradient id="radGrad" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#e2e8f0"/>
+      <stop offset="100%" stop-color="#64748b"/>
+    </linearGradient>
+    <filter id="radShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="5"/>
+      <feOffset dx="0" dy="6" result="offsetblur"/>
+      <feComponentTransfer><feFuncA type="linear" slope="0.35"/></feComponentTransfer>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <!-- end tanks -->
+  <rect x="44" y="70" width="16" height="60" rx="4" fill="#475568" stroke="#1e293b" stroke-width="2" filter="url(#radShadow)"/>
+  <rect x="140" y="70" width="16" height="60" rx="4" fill="#475568" stroke="#1e293b" stroke-width="2" filter="url(#radShadow)"/>
+  <!-- core -->
+  <rect x="60" y="74" width="80" height="52" rx="4" fill="url(#radGrad)" stroke="#1e293b" stroke-width="2" filter="url(#radShadow)"/>
+  <!-- cooling fins -->
+  <g fill="none" stroke="#cbd5e1" stroke-width="1.2" opacity="0.8">
+    <path d="M64 76 Q 66 122 64 126"/>
+    <path d="M80 76 Q 82 122 80 126"/>
+    <path d="M96 76 Q 98 122 96 126"/>
+    <path d="M112 76 Q 114 122 112 126"/>
+    <path d="M128 76 Q 130 122 128 126"/>
+  </g>
+  <!-- hoses -->
+  <path d="M60 100 Q 44 100 40 94 L 40 106 Q 44 100 60 100 Z" fill="#dc2626" opacity="0.9"/>
+  <path d="M140 100 Q 156 100 160 94 L 160 106 Q 156 100 140 100 Z" fill="#94a3b8" opacity="0.9"/>
+  <circle cx="100" cy="156" r="5" fill="#475568" stroke="#64748b" stroke-width="1.5"/>
+</svg>

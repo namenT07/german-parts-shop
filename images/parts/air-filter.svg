@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-labelledby="airTitle" aria-describedby="airDesc">
+  <title id="airTitle">Panel air filter</title>
+  <desc id="airDesc">Automotive engine air filter illustration</desc>
+  <defs>
+    <linearGradient id="airGrad" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#f8fafc"/>
+      <stop offset="100%" stop-color="#cbd5e1"/>
+    </linearGradient>
+    <filter id="airShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="5"/>
+      <feOffset dx="0" dy="6" result="offsetblur"/>
+      <feComponentTransfer><feFuncA type="linear" slope="0.35"/></feComponentTransfer>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <!-- frame -->
+  <rect x="44" y="64" width="112" height="72" rx="8" fill="#1e293b" filter="url(#airShadow)"/>
+  <rect x="52" y="72" width="96" height="56" rx="6" fill="url(#airGrad)" stroke="#475568" stroke-width="2"/>
+  <!-- pleats -->
+  <g fill="none" stroke="#94a3b8" stroke-width="1.4" opacity="0.75">
+    <path d="M56 80 Q 58 110 56 140"/>
+    <path d="M70 80 Q 72 110 70 140"/>
+    <path d="M84 80 Q 86 110 84 140"/>
+    <path d="M98 80 Q 100 110 98 140"/>
+    <path d="M112 80 Q 114 110 112 140"/>
+    <path d="M126 80 Q 128 110 126 140"/>
+    <path d="M140 80 Q 142 110 140 140"/>
+  </g>
+  <rect x="82" y="150" width="36" height="10" rx="4" fill="#dc2626" opacity="0.9"/>
+  <path d="M86 155 Q 92 151 100 155 Q 108 151 114 155" fill="none" stroke="#ffffff" stroke-width="1.5"/>
+</svg>

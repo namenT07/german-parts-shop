@@ -16,22 +16,44 @@
                 <span class="logo-badge">PRO</span>
             </a>
 
+            <!-- Мой гараж: быстрый селектор авто -->
+            <div class="garage-selector" id="garageSelector" style="display:none;">
+                <div class="garage-badge" id="garageBadge" title="Сменить автомобиль">🚗 Нет авто</div>
+                <div class="garage-dropdown" id="garageDropdown">
+                    <select id="garageMake" class="select-custom"></select>
+                    <select id="garageModel" class="select-custom" disabled></select>
+                    <select id="garageYear" class="select-custom" disabled></select>
+                    <select id="garageEngine" class="select-custom" disabled></select>
+                    <div class="garage-actions">
+                        <button class="btn-secondary" id="garageSave">Сохранить</button>
+                        <button class="btn-secondary" id="garageClear">Очистить</button>
+                    </div>
+                    <div id="garageSummary" class="garage-summary"></div>
+                </div>
+            </div>
+
             <div class="header-search">
                 <span class="header-search-icon">🔍</span>
-                <input type="text" placeholder="Поиск по артикулу, названию или бренду..." class="header-search-input">
+                <input type="text" placeholder="Поиск по артикулу, названию, бренду или VIN..." class="header-search-input">
+                <button class="btn-vin" onclick="openVINModal()" title="Подбор по VIN">VIN</button>
             </div>
 
             <div class="nav-actions">
                 <a href="index.html" class="nav-link active">🏠 Главная</a>
                 <a href="catalog.html" class="nav-link">📁 Каталог</a>
-
                 <button class="theme-toggle-btn" onclick="toggleTheme()" title="Переключить тему">☀️</button>
-
                 <a href="cart.html" class="cart-nav-btn">
                     <span>🛒 Корзина</span>
                     <span class="cart-badge">0</span>
                 </a>
             </div>
+        </div>
+
+        <!-- Баннер выбранного авто -->
+        <div class="garage-banner" id="garageBanner">
+            <span class="garage-banner-icon">🚗</span>
+            <span id="garageBannerText">Подбор по авто</span>
+            <button class="garage-banner-close" onclick="document.getElementById('garageSelector').style.display='flex'; document.getElementById('garageBanner').style.display='none';">×</button>
         </div>
     </header>
 
@@ -47,90 +69,53 @@
                     Мгновенный подбор по VIN-коду или модели автомобиля. Гарантия полной совместимости, дилерское качество компонентов и доставка день в день по всей России.
                 </p>
 
-                <!-- Доверительные показатели -->
                 <div class="trust-grid">
-                    <div class="trust-item">
-                        <span class="trust-val">100%</span>
-                        <span class="trust-lbl">Оригиналы & OEM</span>
+                    <div class="trust-item"><span class="trust-val">100%</span><span class="trust-lbl">Оригиналы & OEM</span></div>
+                    <div class="trust-item"><span class="trust-val">25 000+</span><span class="trust-lbl">Деталей на складе</span></div>
+                    <div class="trust-item"><span class="trust-val">24 мес.</span><span class="trust-lbl">Официальная гарантия</span></div>
+                    <div class="trust-item"><span class="trust-val">1 день</span><span class="trust-lbl">Экспресс-доставка</span></div>
+                </div>
+
+                <!-- ИНТЕРАКТИВНЫЙ ВИДЖЕТ ПОДБОРА -->
+                <div class="search-widget">
+                    <div class="tabs-header">
+                        <button class="tab-btn active" id="tabAutoBtn">Подбор по авто</button>
+                        <button class="tab-btn" id="tabVinBtn">Поиск по VIN</button>
                     </div>
-                    <div class="trust-item">
-                        <span class="trust-val">25 000+</span>
-                        <span class="trust-lbl">Деталей на складе</span>
+
+                    <div class="selector-panel" id="panelAuto">
+                        <div class="control-group">
+                            <label class="control-label">01. Марка</label>
+                            <div class="select-wrapper"><select id="makeSelect" class="select-custom"><option value="">Выбрать Марку</option><option value="Audi">Audi</option><option value="BMW">BMW</option><option value="Mercedes-Benz">Mercedes-Benz</option><option value="Porsche">Porsche</option><option value="Volkswagen">Volkswagen</option></select></div>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label">02. Модель</label>
+                            <div class="select-wrapper"><select id="modelSelect" class="select-custom" disabled><option value="">Сначала выберите марку</option></select></div>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label">03. Год / Кузов</label>
+                            <div class="select-wrapper"><select id="genSelect" class="select-custom" disabled><option value="">Год / Поколение</option></select></div>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label">&nbsp;</label>
+                            <button id="searchBtn" class="btn-primary"><span>Открыть каталог</span> →</button>
+                        </div>
                     </div>
-                    <div class="trust-item">
-                        <span class="trust-val">24 мес.</span>
-                        <span class="trust-lbl">Официальная гарантия</span>
-                    </div>
-                    <div class="trust-item">
-                        <span class="trust-val">1 день</span>
-                        <span class="trust-lbl">Экспресс-доставка</span>
+
+                    <div class="selector-panel" id="panelVin" style="display: none; grid-template-columns: 1fr auto;">
+                        <div class="control-group">
+                            <label class="control-label">Введите 17 символов VIN-кода кузова</label>
+                            <input type="text" id="heroVinInput" placeholder="Например: WBA3A510X0L123456" class="input-custom" maxlength="17">
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label">&nbsp;</label>
+                            <button class="btn-primary" onclick="submitHeroVIN()"><span>Найти по VIN</span> 🔍</button>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- ИНТЕРАКТИВНЫЙ ВИДЖЕТ ПОДБОРА -->
-            <div class="search-widget">
-                <div class="tabs-header">
-                    <button class="tab-btn active" id="tabAutoBtn">Подбор по авто</button>
-                    <button class="tab-btn" id="tabVinBtn">Поиск по VIN</button>
-                </div>
-
-                <!-- Панель по автомобилю -->
-                <div class="selector-panel" id="panelAuto">
-                    <div class="control-group">
-                        <label class="control-label">01. Марка</label>
-                        <div class="select-wrapper">
-                            <select id="makeSelect" class="select-custom">
-                                <option value="">Выбрать Марку</option>
-                                <option value="Audi">Audi</option>
-                                <option value="BMW">BMW</option>
-                                <option value="Mercedes-Benz">Mercedes-Benz</option>
-                                <option value="Porsche">Porsche</option>
-                                <option value="Volkswagen">Volkswagen</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="control-group">
-                        <label class="control-label">02. Модель</label>
-                        <div class="select-wrapper">
-                            <select id="modelSelect" class="select-custom" disabled>
-                                <option value="">Сначала выберите марку</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="control-group">
-                        <label class="control-label">03. Год / Кузов</label>
-                        <div class="select-wrapper">
-                            <select id="genSelect" class="select-custom" disabled>
-                                <option value="">Год / Поколение</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="control-group">
-                        <label class="control-label">&nbsp;</label>
-                        <button id="searchBtn" class="btn-primary">
-                            <span>Открыть каталог</span> →
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Панель по VIN -->
-                <div class="selector-panel" id="panelVin" style="display: none; grid-template-columns: 1fr auto;">
-                    <div class="control-group">
-                        <label class="control-label">Введите 17 символов VIN-кода кузова</label>
-                        <input type="text" placeholder="Например: WBA3A510X0L123456" class="input-custom" maxlength="17">
-                    </div>
-                    <div class="control-group">
-                        <label class="control-label">&nbsp;</label>
-                        <button class="btn-primary" onclick="window.location.href='catalog.html'">
-                            <span>Найти по VIN</span> 🔍
-                        </button>
-                    </div>
-                </div>
-            </div>
+            <div class="hero-visual">🚗</div>
         </section>
 
         <!-- ПОПУЛЯРНЫЕ КАТЕГОРИИ -->
@@ -139,59 +124,17 @@
                 <h2 class="section-title">Категории запчастей</h2>
                 <a href="catalog.html" class="section-link">Смотреть весь каталог →</a>
             </div>
-
             <div class="categories-grid">
-                <a href="catalog.html" class="category-card">
-                    <div class="category-icon">⚙️</div>
-                    <div class="category-info">
-                        <h3>Двигатель и ГРМ</h3>
-                        <p>Цепи, ремни, поршни, клапаны и прокладки</p>
-                    </div>
-                </a>
-
-                <a href="catalog.html" class="category-card">
-                    <div class="category-icon">💿</div>
-                    <div class="category-info">
-                        <h3>Тормозная система</h3>
-                        <p>Диски, керамоколодки, суппорты и датчики</p>
-                    </div>
-                </a>
-
-                <a href="catalog.html" class="category-card">
-                    <div class="category-icon">🛞</div>
-                    <div class="category-info">
-                        <h3>Подвеска и рулевое</h3>
-                        <p>Амортизаторы, рычаги, сайлентблоки</p>
-                    </div>
-                </a>
-
-                <a href="catalog.html" class="category-card">
-                    <div class="category-icon">🛢️</div>
-                    <div class="category-info">
-                        <h3>Фильтры и Масла</h3>
-                        <p>Масляные, воздушные, салонные и масляные составы</p>
-                    </div>
-                </a>
-
-                <a href="catalog.html" class="category-card">
-                    <div class="category-icon">💡</div>
-                    <div class="category-info">
-                        <h3>Оптика и Освещение</h3>
-                        <p>Adaptive LED, Laser headlights, блочные модули</p>
-                    </div>
-                </a>
-
-                <a href="catalog.html" class="category-card">
-                    <div class="category-icon">🔌</div>
-                    <div class="category-info">
-                        <h3>Электроника и Датчики</h3>
-                        <p>Датчики ABS, блоки управления, свечи зажигания</p>
-                    </div>
-                </a>
+                <a href="catalog.html" class="category-card"><div class="category-icon">⚙️</div><div class="category-info"><h3>Двигатель и ГРМ</h3><p>Цепи, ремни, поршни, клапаны и прокладки</p></div></a>
+                <a href="catalog.html" class="category-card"><div class="category-icon">💿</div><div class="category-info"><h3>Тормозная система</h3><p>Диски, керамоколодки, суппорты и датчики</p></div></a>
+                <a href="catalog.html" class="category-card"><div class="category-icon">🛞</div><div class="category-info"><h3>Подвеска и рулевое</h3><p>Амортизаторы, рычаги, сайлентблоки</p></div></a>
+                <a href="catalog.html" class="category-card"><div class="category-icon">🛢️</div><div class="category-info"><h3>Фильтры и Масла</h3><p>Масляные, воздушные, салонные и масляные составы</p></div></a>
+                <a href="catalog.html" class="category-card"><div class="category-icon">💡</div><div class="category-info"><h3>Оптика и Освещение</h3><p>Adaptive LED, Laser headlights, блочные модули</p></div></a>
+                <a href="catalog.html" class="category-card"><div class="category-icon">🔌</div><div class="category-info"><h3>Электроника и Датчики</h3><p>Датчики ABS, блоки управления, свечи зажигания</p></div></a>
             </div>
         </section>
 
-        <!-- РЕКОМЕНДУЕМЫЕ ТОВАРЫ / БЕСТСЕЛЛЕРЫ -->
+        <!-- РЕКОМЕНДУЕМЫЕ ТОВАРЫ -->
         <section>
             <div class="section-header">
                 <div>
@@ -200,24 +143,17 @@
                 </div>
                 <a href="catalog.html" class="section-link">Все предложения →</a>
             </div>
-
-            <div class="products-grid" id="featured-products-grid">
-                <!-- Заполняется динамически из app.js -->
-            </div>
+            <div class="products-grid" id="featured-products-grid"></div>
         </section>
 
     </main>
 
-    <!-- ПОДВАЛ САЙТА -->
     <footer>
         <div class="footer-container">
             <div class="footer-brand">
                 <a href="index.html" class="logo"><span>German</span>Auto</a>
-                <p class="footer-desc">
-                    Флагманская онлайн-платформа подбора и поставки премиальных автокомпонентов для автомобилей Audi, BMW, Mercedes-Benz, Porsche и Volkswagen.
-                </p>
+                <p class="footer-desc">Флагманская онлайн-платформа подбора и поставки премиальных автокомпонентов для автомобилей Audi, BMW, Mercedes-Benz, Porsche и Volkswagen.</p>
             </div>
-
             <div class="footer-col">
                 <h4>Каталог</h4>
                 <ul>
@@ -227,7 +163,6 @@
                     <li><a href="catalog.html">Оригинальные масла OEM</a></li>
                 </ul>
             </div>
-
             <div class="footer-col">
                 <h4>Сервис</h4>
                 <ul>
@@ -237,7 +172,6 @@
                     <li><a href="#">Партнерская программа</a></li>
                 </ul>
             </div>
-
             <div class="footer-col">
                 <h4>Контакты</h4>
                 <ul>
@@ -247,33 +181,38 @@
                 </ul>
             </div>
         </div>
-
         <div class="footer-bottom">
             <span>© 2025 GERMANAUTO PRO. Все права защищены.</span>
             <span>Премиальный сервис подбора запчастей для немецких автомобилей</span>
         </div>
     </footer>
 
-    <!-- МОБИЛЬНАЯ ПАНЕЛЬ НАВИГАЦИИ -->
     <nav class="mobile-nav-bar">
-        <a href="index.html" class="mobile-tab-item active">
-            <span class="mobile-tab-icon">🏠</span>
-            <span>Главная</span>
-        </a>
-        <a href="catalog.html" class="mobile-tab-item">
-            <span class="mobile-tab-icon">📁</span>
-            <span>Каталог</span>
-        </a>
-        <a href="cart.html" class="mobile-tab-item">
-            <span class="mobile-tab-icon">🛒</span>
-            <span>Корзина</span>
-        </a>
-        <button class="mobile-tab-item theme-toggle-btn" style="background:none; border:none; padding:0;" onclick="toggleTheme()">
-            <span class="mobile-tab-icon">☀️</span>
-            <span>Тема</span>
-        </button>
+        <a href="index.html" class="mobile-tab-item active"><span class="mobile-tab-icon">🏠</span><span>Главная</span></a>
+        <a href="catalog.html" class="mobile-tab-item"><span class="mobile-tab-icon">📁</span><span>Каталог</span></a>
+        <a href="cart.html" class="mobile-tab-item"><span class="mobile-tab-icon">🛒</span><span>Корзина</span></a>
+        <button class="mobile-tab-item theme-toggle-btn" style="background:none; border:none; padding:0;" onclick="toggleTheme()"><span class="mobile-tab-icon">☀️</span><span>Тема</span></button>
     </nav>
 
     <script src="app.js"></script>
+    <script>
+        // Hero VIN submit
+        function submitHeroVIN() {
+            const input = document.getElementById('heroVinInput');
+            const vin = input.value.trim();
+            if (!/^[A-HJ-NPR-Z0-9]{17}$/.test(vin)) {
+                showToast('Некорректный VIN-код (17 символов)', '⚠️');
+                return;
+            }
+            const brand = decodeVIN(vin);
+            if (brand) {
+                showToast(`По VIN определена марка: ${brand}`, '🔍');
+                window.location.href = `catalog.html?make=${encodeURIComponent(brand)}`;
+            } else {
+                showToast('Марка по VIN не определена — открыт каталог', 'ℹ️');
+                window.location.href = 'catalog.html';
+            }
+        }
+    </script>
 </body>
 </html>

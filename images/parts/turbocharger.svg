@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-labelledby="turboTitle" aria-describedby="turboDesc">
+  <title id="turboTitle">Turbocharger</title>
+  <desc id="turboDesc">Automotive turbocharger with compressor housing illustration</desc>
+  <defs>
+    <linearGradient id="turboGrad" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#e2e8f0"/>
+      <stop offset="100%" stop-color="#64748b"/>
+    </linearGradient>
+    <filter id="turboShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="5"/>
+      <feOffset dx="0" dy="6" result="offsetblur"/>
+      <feComponentTransfer><feFuncA type="linear" slope="0.35"/></feComponentTransfer>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <!-- compressor housing (snail) -->
+  <path d="M110 60 Q 140 60 156 78 Q 164 96 152 114 Q 140 130 110 130 Q 80 130 64 112 Q 56 94 64 76 Q 72 58 90 60 Z" fill="url(#turboGrad)" stroke="#1e293b" stroke-width="2.5" filter="url(#turboShadow)"/>
+  <path d="M110 100 Q 130 90 148 100 Q 142 120 120 120 Q 100 120 100 100 Z" fill="#475568"/>
+  <!-- impeller blades -->
+  <g fill="#94a3b8">
+    <path d="M100 70 L 110 78 L 104 82 L 100 76 Z"/>
+    <path d="M122 82 L 130 90 L 124 94 L 116 86 Z"/>
+    <path d="M110 108 L 102 100 L 108 94 L 116 102 Z"/>
+    <path d="M90 98 L 82 90 L 88 86 L 96 94 Z"/>
+  </g>
+  <!-- wastegate actuator -->
+  <rect x="64" y="124" width="20" height="24" rx="4" fill="#334155" stroke="#1e293b" stroke-width="1.5"/>
+  <rect x="70" y="140" width="8" height="8" rx="2" fill="#dc2626"/>
+  <rect x="140" y="124" width="16" height="18" rx="3" fill="#475568" stroke="#1e293b" stroke-width="1.5"/>
+  <circle cx="100" cy="98" r="4" fill="#cbd5e1"/>
+</svg>

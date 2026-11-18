@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-labelledby="exhTitle" aria-describedby="exhDesc">
+  <title id="exhTitle">Exhaust manifold</title>
+  <desc id="exhDesc">Automotive exhaust header manifold illustration</desc>
+  <defs>
+    <linearGradient id="exhGrad" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#94a3b8"/>
+      <stop offset="100%" stop-color="#475568"/>
+    </linearGradient>
+    <filter id="exhShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="5"/>
+      <feOffset dx="0" dy="6" result="offsetblur"/>
+      <feComponentTransfer><feFuncA type="linear" slope="0.35"/></feComponentTransfer>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <!-- collector -->
+  <path d="M130 90 Q 150 90 166 110 Q 174 130 156 144 Q 136 144 120 130 Q 104 116 104 90 Z" fill="url(#exhGrad)" stroke="#1e293b" stroke-width="2.5" filter="url(#exhShadow)"/>
+  <!-- primaries -->
+  <path d="M104 90 L 82 90 Q 68 90 64 106 Q 60 122 74 122 Q 88 122 104 122 L 104 106" fill="none" stroke="#64748b" stroke-width="5" stroke-linecap="round" opacity="0.8"/>
+  <path d="M104 90 L 126 90 Q 142 90 146 106 Q 150 122 136 122 Q 122 122 104 122" fill="none" stroke="#64748b" stroke-width="5" stroke-linecap="round" opacity="0.8"/>
+  <path d="M104 90 L 104 70 Q 104 54 90 54 Q 76 54 72 70 Q 68 86 82 86 Q 96 86 104 86 Z" fill="none" stroke="#64748b" stroke-width="5" stroke-linecap="round" opacity="0.8"/>
+  <rect x="150" y="138" width="26" height="16" rx="4" fill="#1e293b"/>
+  <circle cx="100" cy="156" r="5" fill="#475568" stroke="#64748b" stroke-width="1.5"/>
+</svg>

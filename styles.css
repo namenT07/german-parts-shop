@@ -1661,6 +1661,89 @@ footer {
 /* VIN modal result already handled inline */
 
 /* ==========================================================================
+   BLUEPRINT INTERACTIVE EXPLORER (статичный чертёж авто в профиль)
+   ========================================================================== */
+.blueprint-stage {
+    position: relative;
+    width: 100%;
+    max-width: 1000px;
+    margin: 24px auto 0 auto;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-xl);
+    background: #0b101a;
+    display: block;
+}
+.blueprint-base {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+.blueprint-overlay {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+.blueprint-part {
+    cursor: pointer;
+    transition: transform 0.22s cubic-bezier(0.4, 0, 0.2, 1), filter 0.22s;
+    outline: none;
+    pointer-events: auto;
+}
+.blueprint-part:focus {
+    filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.45));
+}
+.part-tooltip {
+    position: fixed;
+    z-index: 60;
+    display: none;
+    max-width: 220px;
+    padding: 10px 14px;
+    border-radius: var(--radius-md);
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-left: 4px solid var(--primary);
+    color: var(--text-primary);
+    box-shadow: var(--shadow-lg);
+    font-size: 13px;
+    pointer-events: auto;
+}
+#ttName {
+    display: block;
+    font-weight: 800;
+    color: var(--primary);
+    margin-bottom: 6px;
+}
+#ttLink {
+    display: inline-block;
+    color: var(--text-secondary);
+    font-size: 12px;
+    text-decoration: underline;
+    margin-bottom: 6px;
+}
+#ttLink:hover {
+    color: var(--primary);
+}
+.tt-close {
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-size: 20px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 2px 6px;
+    border-radius: var(--radius-sm);
+}
+.tt-close:hover {
+    color: var(--text-primary);
+    background: var(--bg-elevated);
+}
+
+/* ==========================================================================
    VECTOR ICONS & PART IMAGES
    ========================================================================== */
 .icon { display: inline-block; vertical-align: middle; }
@@ -1690,32 +1773,7 @@ footer {
     overflow: hidden;
 }
 @media (min-width: 1024px) { .hero-visual { min-height: 460px; } }
-.hero-visual canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
-.webgl-fallback { color: var(--text-secondary); text-align: center; }
-.hero3d-tooltip {
-    position: absolute; pointer-events: none; z-index: 60;
-    background: var(--bg-elevated); border: 1px solid var(--border-color);
-    border-left: 4px solid var(--primary); color: var(--text-primary);
-    padding: 10px 14px; border-radius: var(--radius-md); font-size: 13px;
-    box-shadow: var(--shadow-lg); display: none; white-space: nowrap;
-    min-width: 160px; text-align: center;
-}
-.hud-name { font-weight: 800; color: var(--primary); margin-bottom: 2px; }
-.hud-hint { font-size: 11px; color: var(--text-secondary); }
-.hero3d-layers {
-    position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%);
-    display: flex; gap: 8px; z-index: 60;
-    background: var(--bg-glass); padding: 6px;
-    border-radius: var(--radius-full); border: 1px solid var(--border-color);
-    backdrop-filter: blur(8px);
-}
-.hud-btn {
-    background: transparent; border: 1px solid transparent; color: var(--text-secondary);
-    font-size: 12px; font-weight: 700; padding: 6px 14px; border-radius: var(--radius-md);
-    cursor: pointer; transition: var(--transition);
-}
-.hud-btn:hover { color: var(--text-primary); background: var(--bg-elevated); }
-.hud-btn.active { color: var(--primary); border-color: var(--primary); background: var(--primary-subtle); }
+
 
 @media (max-width: 768px) {
     .hero-wrapper { grid-template-columns: 1fr !important; }

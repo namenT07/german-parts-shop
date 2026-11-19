@@ -115,7 +115,20 @@
                 </div>
             </div>
 
-            <div class="hero-visual" id="hero3d"></div>
+            <div class="hero-visual">
+                <!-- Интерактивный сборочный чертеж автомобиля (базовый слой — фото эскиза) -->
+                <div class="blueprint-stage" id="blueprintStage">
+                    <img src="images/blueprint-car.png" alt="Сборочный чертёж автомобиля в профиль" class="blueprint-base" loading="lazy" />
+                    <svg class="blueprint-overlay" viewBox="0 0 1125 869" preserveAspectRatio="xMidYMid meet" aria-label="Интерактивные узлы автомобиля">
+                        <!-- Цветные интерактивные узлы внедряются скриптом -->
+                    </svg>
+                    <div class="part-tooltip" id="partTooltip" role="tooltip" aria-hidden="true">
+                        <button class="tt-close" id="ttClose" aria-label="Закрыть подсказку">×</button>
+                        <div id="ttName"></div>
+                        <a href="#" id="ttLink" class="tt-link">Подобрать детали →</a>
+                    </div>
+                </div>
+            </div>
         </section>
 
         <!-- ПОПУЛЯРНЫЕ КАТЕГОРИИ -->
@@ -194,7 +207,6 @@
         <button class="mobile-tab-item theme-toggle-btn" style="background:none; border:none; padding:0;" onclick="toggleTheme()"><span class="mobile-tab-icon" data-icon="sun" data-size="20"></span><span>Тема</span></button>
     </nav>
 
-    <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
     <script src="app.js"></script>
     <script>
         // Hero VIN submit

@@ -1593,295 +1593,141 @@ function renderFeatured() {
 }
 
 /* ==========================================================================
-   18. HERO 3D X-RAY CAR EXPLORER (vanilla Three.js, no build step)
+   18. BLUEPRINT INTERACTIVE EXPLORER (статичный чертёж авто в профиль)
    ========================================================================== */
-function isWebGLAvailable() {
-    try {
-        const c = document.createElement('canvas');
-        return !!(window.WebGLRenderingContext && (c.getContext('webgl') || c.getContext('experimental-webgl')));
-    } catch (e) { return false; }
-}
+/* Узлы автомобиля, нанесённые на чертёж. Каждый узел — свой цвет, своя категория каталога. */
+const BLUEPRINT_PARTS = [
+    { id: "front-bumper", name: "Передний бампер", category: "chassis", color: "#ef4444", type: "rect", x: 110, y: 350, w: 95, h: 85 },
+    { id: "headlight", name: "Фара", category: "optics", color: "#fbbf24", type: "ellipse", cx: 135, cy: 385, rx: 30, ry: 22 },
+    { id: "radiator", name: "Радиатор / интеркулер", category: "engine", color: "#06b6d4", type: "rect", x: 190, y: 365, w: 75, h: 40 },
+    { id: "engine-block", name: "Двигатель / впуск", category: "engine", color: "#a21caf", type: "rect", x: 205, y: 295, w: 155, h: 85 },
+    { id: "air-intake", name: "Воздушный фильтр", category: "engine", color: "#c084fc", type: "rect", x: 245, y: 325, w: 65, h: 45 },
+    { id: "suspension-front", name: "Стойка подвески", category: "chassis", color: "#10b981", type: "rect", x: 250, y: 330, w: 38, h: 130 },
+    { id: "brake-disc", name: "Тормозной диск", category: "brakes", color: "#f43f5e", type: "ellipse", cx: 270, cy: 414, rx: 44, ry: 47 },
+    { id: "brake-caliper", name: "Суппорт тормоза", category: "brakes", color: "#ec4899", type: "rect", x: 252, y: 395, w: 40, h: 30 },
+    { id: "wheel-front", name: "Передние колёса", category: "chassis", color: "#3b82f6", type: "ellipse", cx: 270, cy: 414, rx: 50, ry: 53 },
+    { id: "wheel-rear", name: "Задние колёса", category: "chassis", color: "#2563eb", type: "ellipse", cx: 742, cy: 414, rx: 50, ry: 53 },
+    { id: "exhaust", name: "Выпускная система", category: "engine", color: "#6b7280", type: "rect", x: 800, y: 438, w: 140, h: 22 },
+    { id: "door-front", name: "Передняя дверь", category: "chassis", color: "#14b8a6", type: "rect", x: 430, y: 298, w: 128, h: 142 },
+    { id: "door-rear", name: "Задняя дверь", category: "chassis", color: "#0ea5e9", type: "rect", x: 562, y: 298, w: 128, h: 142 },
+    { id: "window", name: "Окна салона", category: "chassis", color: "#22d3ee", type: "rect", x: 438, y: 228, w: 255, h: 115 },
+    { id: "seat", name: "Сиденья салона", category: "chassis", color: "#f472b6", type: "rect", x: 445, y: 328, w: 95, h: 85 },
+    { id: "steering-wheel", name: "Руль", category: "chassis", color: "#f97316", type: "circle", cx: 480, cy: 332, r: 20 },
+    { id: "rear-bumper", name: "Задний бампер", category: "chassis", color: "#dc2626", type: "rect", x: 825, y: 350, w: 135, h: 90 },
+    { id: "taillight", name: "Задний фонарь", category: "optics", color: "#facc15", type: "rect", x: 895, y: 360, w: 45, h: 28 }
+];
 
-// Minimal OrbitControls: drag to rotate, scroll to zoom, auto-rotate pausing on interaction
-function OrbitControls(camera, domElement) {
-    this.camera = camera; this.domElement = domElement;
-    this.target = new THREE.Vector3(0, 0, 0);
-    this.enabled = true; this.autoRotate = true; this.autoRotateSpeed = 1;
-    this.enableZoom = true;
-    this._phi = Math.PI / 2.6; this._theta = -0.4; this._radius = 7.5;
-    this._isDown = false; this._last = new THREE.Vector2(); this._autoPaused = 0;
-    const scope = this;
-    function onDown(e){ if(!scope.enabled) return; scope._isDown = true; scope._last.set(e.clientX, e.clientY); scope.autoRotate = false; scope._autoPaused = Date.now() + 900; }
-    function onMove(e){ if(!scope._isDown) return; scope._theta -= (e.clientX - scope._last.x) * 0.005; scope._phi += (e.clientY - scope._last.y) * 0.005; scope._last.set(e.clientX, e.clientY); scope._phi = Math.max(0.15, Math.min(Math.PI - 0.15, scope._phi)); }
-    function onUp(){ scope._isDown = false; }
-    function onWheel(e){ e.preventDefault(); scope._radius *= e.deltaY > 0 ? 1.12 : 0.90; scope._radius = Math.max(4.5, Math.min(16, scope._radius)); }
-    domElement.addEventListener('pointerdown', onDown); domElement.addEventListener('pointermove', onMove);
-    domElement.addEventListener('pointerup', onUp); domElement.addEventListener('pointerleave', onUp);
-    domElement.addEventListener('wheel', onWheel, { passive: false });
-    this.update = function () {
-        if (scope.autoRotate && Date.now() > scope._autoPaused && !scope._isDown) scope._theta += 0.0025 * scope.autoRotateSpeed;
-        const x = scope._radius * Math.sin(scope._phi) * Math.sin(scope._theta);
-        const y = scope._radius * Math.cos(scope._phi);
-        const z = scope._radius * Math.sin(scope._phi) * Math.cos(scope._theta);
-        scope.camera.position.set(x, y, z); scope.camera.lookAt(scope.target);
-    };
-    this.dispose = function () {
-        domElement.removeEventListener('pointerdown', onDown); domElement.removeEventListener('pointermove', onMove);
-        domElement.removeEventListener('pointerup', onUp); domElement.removeEventListener('pointerleave', onUp);
-        domElement.removeEventListener('wheel', onWheel);
-    };
-}
+function escHtml(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
 
-function buildXRayCar() {
-    const group = new THREE.Group();
-    const xray = new THREE.ShaderMaterial({
-        uniforms: { baseColor: { value: new THREE.Color(0x0f172a) }, opacity: { value: 0.10 } },
-        vertexShader: [
-            'varying float vFresnel; varying vec3 vNormal;',
-            'void main(){',
-            '  vNormal = normalize(normalMatrix * normal);',
-            '  vec3 w = (modelMatrix * vec4(position,1.0)).xyz;',
-            '  vec3 vd = normalize(cameraPosition - w);',
-            '  vFresnel = 1.0 - dot(vNormal, vd);',
-            '  gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0);',
-            '}'
-        ].join('\n'),
-        fragmentShader: [
-            'uniform vec3 baseColor; uniform float opacity; varying float vFresnel;',
-            'void main(){',
-            '  float a = pow(vFresnel, 2.6) * opacity;',
-            '  vec3 c = mix(baseColor, vec3(0.35, 0.7, 1.0), vFresnel * 0.55);',
-            '  gl_FragColor = vec4(c, a);',
-            '}'
-        ].join('\n'),
-        transparent: true, side: THREE.DoubleSide
-    });
-    const wire = new THREE.LineBasicMaterial({ color: 0x3b82f6, transparent: true, opacity: 0.30 });
-
-    const chassis = [
-        { s: [4.2, 0.45, 1.7], p: [0, -0.35, 0] },        // floor
-        { s: [2.2, 0.95, 1.45], p: [-0.9, 0.55, 0] },     // cabin
-        { s: [1.8, 0.45, 1.45], p: [1.05, 0.0, 0] },      // hood
-        { s: [1.9, 0.18, 1.25], p: [-0.9, 1.3, 0] },      // roof
-        { s: [0.7, 0.4, 1.45], p: [-2.35, -0.1, 0] },     // trunk
-        { s: [4.2, 0.12, 1.75], p: [0, -0.62, 0] }        // underside
-    ];
-    const outlineMeshes = [];
-    chassis.forEach(c => {
-        const m = new THREE.Mesh(new THREE.BoxGeometry(c.s[0], c.s[1], c.s[2]), xray);
-        m.position.set(c.p[0], c.p[1], c.p[2]); group.add(m);
-        const edges = new THREE.EdgesGeometry(m.geometry);
-        const l = new THREE.LineSegments(edges, wire);
-        l.position.copy(m.position); l.rotation.copy(m.rotation); l.scale.copy(m.scale);
-        group.add(l); outlineMeshes.push(l);
-    });
-    // wheels (translucent)
-    const wheelMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, transparent: true, opacity: 0.18, metalness: 0.8, roughness: 0.2 });
-    [[1.4, -0.55, 0.85], [1.4, -0.55, -0.85], [-1.4, -0.55, 0.85], [-1.4, -0.55, -0.85]].forEach(p => {
-        const w = new THREE.Mesh(new THREE.CylinderGeometry(0.34, 0.34, 0.55, 16), wheelMat);
-        w.rotation.z = Math.PI / 2; w.position.set(p[0], p[1], p[2]); group.add(w);
-        const we = new THREE.LineSegments(new THREE.EdgesGeometry(w.geometry), wire);
-        we.position.copy(w.position); we.rotation.copy(w.rotation); group.add(we);
-    });
-
-    const sysMat = (color) => new THREE.MeshStandardMaterial({ color, emissive: new THREE.Color(0x000000), emissiveIntensity: 0, metalness: 0.5, roughness: 0.35 });
-    const SYSTEMS = [
-        { key: 'engine', label: 'Двигатель и турбина', category: 'engine', color: 0xdc2626, p: [0.15, -0.15, 0.05] },
-        { key: 'brakes', label: 'Тормозная система', category: 'brakes', color: 0xef4444, p: [1.15, -0.5, 0.75] },
-        { key: 'suspension', label: 'Подвеска и coilover', category: 'chassis', color: 0x3b82f6, p: [-1.15, -0.5, -0.75] },
-        { key: 'exhaust', label: 'Выпускная система', category: 'chassis', color: 0x64748b, p: [-1.35, -0.65, 0] },
-        { key: 'transmission', label: 'Коробка передач', category: 'chassis', color: 0xf59e0b, p: [-0.7, -0.35, -1.05] },
-        { key: 'battery', label: 'Аккумулятор и генератор', category: 'electrical', color: 0x10b981, p: [-1.6, 0.05, 0.75] },
-        { key: 'radiator', label: 'Радиатор и охлаждение', category: 'engine', color: 0x06b6d4, p: [-1.95, -0.05, 0] }
-    ];
-    const assemblies = [];
-    SYSTEMS.forEach(s => {
-        const g = new THREE.Group();
-        const m = sysMat(s.color);
-        const add = (shape, pos, rot, sc) => {
-            const o = new THREE.Mesh(shape, m);
-            if (pos) o.position.set(pos[0], pos[1], pos[2]);
-            if (rot) o.rotation.set(rot[0], rot[1], rot[2]);
-            if (sc) o.scale.set(sc[0], sc[1], sc[2]);
-            g.add(o); return o;
-        };
-        if (s.key === 'engine') {
-            add(new THREE.BoxGeometry(0.85, 0.5, 0.65), [0, 0.3, 0]);
-            add(new THREE.BoxGeometry(0.85, 0.18, 0.65), [0, 0.62, 0]);
-            add(new THREE.CylinderGeometry(0.16, 0.16, 0.4, 12), [0.5, 0.35, 0.25], [0, 0, Math.PI/2]);      // turbo
-            add(new THREE.ConeGeometry(0.14, 0.35, 8), [0.7, 0.35, 0.25], [0, 0, Math.PI/2]);
-        } else if (s.key === 'brakes') {
-            add(new THREE.CylinderGeometry(0.3, 0.3, 0.08, 24), [0, 0, 0], [Math.PI/2, 0, 0]);             // rotor
-            add(new THREE.BoxGeometry(0.22, 0.28, 0.14), [0.32, 0, 0]);                                   // caliper
-            add(new THREE.BoxGeometry(0.06, 0.22, 0.12), [0.44, 0, 0]);                                   // pad
-        } else if (s.key === 'suspension') {
-            add(new THREE.CylinderGeometry(0.07, 0.07, 0.75, 12), [0, -0.4, 0], [0, 0, 0]);                // shock
-            add(new THREE.TorusGeometry(0.28, 0.035, 8, 24), [0, -0.75, 0], [Math.PI/2, 0, 0]);            // coil spring
-            add(new THREE.BoxGeometry(0.14, 0.14, 0.35), [0, -1.05, 0]);                                  // lower arm
-        } else if (s.key === 'exhaust') {
-            add(new THREE.BoxGeometry(0.5, 0.14, 0.16), [0, 0, 0]);                                       // manifold
-            add(new THREE.CylinderGeometry(0.09, 0.09, 0.7, 12), [0, -0.2, 0], [0, 0, Math.PI/2]);          // pipe
-            add(new THREE.BoxGeometry(0.3, 0.16, 0.22), [0.5, -0.25, 0]);                                 // muffler
-        } else if (s.key === 'transmission') {
-            add(new THREE.BoxGeometry(0.6, 0.3, 0.5), [0, 0, 0]);                                        // gearbox
-            add(new THREE.CylinderGeometry(0.1, 0.1, 0.7, 12), [0.5, 0, 0], [0, Math.PI/2, 0]);           // driveshaft
-        } else if (s.key === 'battery') {
-            add(new THREE.BoxGeometry(0.34, 0.2, 0.5), [0, 0, 0]);                                        // battery
-            add(new THREE.CylinderGeometry(0.11, 0.11, 0.4, 12), [0.3, 0.15, 0.1], [0, 0, 0]);             // alternator
-        } else if (s.key === 'radiator') {
-            add(new THREE.BoxGeometry(0.05, 0.5, 0.9), [0, 0, 0]);                                        // core
-            for (let i = -0.4; i <= 0.4; i += 0.2) add(new THREE.BoxGeometry(0.05, 0.08, 0.04), [0, i, 0.45]);
-            add(new THREE.CylinderGeometry(0.05, 0.05, 0.35, 8), [-0.25, 0.25, 0], [0, 0, 0]);             // hose
-        }
-        g.position.set(s.p[0], s.p[1], s.p[2]);
-        g.userData = { system: s.label, category: s.category, color: s.color };
-        group.add(g); assemblies.push({ mesh: g, system: s.label, category: s.category, color: s.color });
-    });
-    return { group, assemblies, outlineMeshes };
-}
-
-function initHero3D() {
-    const container = document.getElementById('hero3d');
-    if (!container) return;
-    if (!isWebGLAvailable()) {
-        container.innerHTML = `<div class="webgl-fallback" style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--text-secondary);padding:24px; text-align:center;">
-            ${renderIcon('car', 44)}
-            <div style="margin-top:10px;font-size:14px;">WebGL не поддерживается в этом браузере</div>
-        </div>`;
-        return;
+function renderBlueprintPart(p) {
+    let shape = "";
+    if (p.type === "rect") {
+        shape = `<rect x="${p.x}" y="${p.y}" width="${p.w}" height="${p.h}" fill="${p.color}" fill-opacity="0.92" />`;
+    } else if (p.type === "circle") {
+        shape = `<circle cx="${p.cx}" cy="${p.cy}" r="${p.r}" fill="${p.color}" fill-opacity="0.92" />`;
+    } else if (p.type === "ellipse") {
+        const fillOp = p.id.indexOf("wheel") === 0 ? 0.30 : 0.92;
+        shape = `<ellipse cx="${p.cx}" cy="${p.cy}" rx="${p.rx}" ry="${p.ry}" fill="${p.color}" fill-opacity="${fillOp}" stroke="${p.color}" stroke-width="3" />`;
     }
-    container.style.position = 'relative';
-    const W = container.clientWidth || 560, H = container.clientHeight || 340;
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(45, W / H, 0.1, 80);
-    camera.position.set(0, 3, 8);
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setSize(W, H);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.domElement.style.position = 'absolute';
-    renderer.domElement.style.top = '0'; renderer.domElement.style.left = '0';
-    renderer.domElement.style.width = '100%'; renderer.domElement.style.height = '100%';
-    renderer.domElement.style.display = 'block';
-    container.appendChild(renderer.domElement);
-
-    const amb = new THREE.AmbientLight(0xffffff, 0.5); scene.add(amb);
-    const dir = new THREE.DirectionalLight(0xffffff, 1.1); dir.position.set(6, 9, 5); scene.add(dir);
-    const fill = new THREE.PointLight(0x3b82f6, 0.7); fill.position.set(-6, 1, 5); scene.add(fill);
-
-    const { group, assemblies, outlineMeshes } = buildXRayCar();
-    scene.add(group);
-
-    const raycaster = new THREE.Raycaster();
-    const pointer = new THREE.Vector2();
-    const tooltip = document.createElement('div');
-    tooltip.className = 'hero3d-tooltip';
-    tooltip.innerHTML = `<div class="hud-name" id="hudSysName"></div><div class="hud-hint">Нажмите, чтобы подобрать детали</div>`;
-    tooltip.style.display = 'none';
-    container.appendChild(tooltip);
-
-    const hud = document.createElement('div');
-    hud.className = 'hero3d-layers';
-    hud.innerHTML = `
-        <button class="hud-btn active" data-layer="all">Все системы</button>
-        <button class="hud-btn" data-layer="engine">Двигатель</button>
-        <button class="hud-btn" data-layer="brakes">Тормоза</button>
-        <button class="hud-btn" data-layer="suspension">Подвеска</button>
-        <button class="hud-btn" data-layer="electrical">Электрика</button>
+    return `
+        <g class="blueprint-part" data-part="${escHtml(p.id)}" data-name="${escHtml(p.name)}" data-category="${escHtml(p.category)}" role="button" tabindex="0" aria-label="${escHtml(p.name)}">
+            <title>${escHtml(p.name)}</title>
+            ${shape}
+        </g>
     `;
-    container.appendChild(hud);
-
-    const controls = new OrbitControls(camera, renderer.domElement);
-
-    let hoverSys = null;
-    function setHover(sys, intersecting) {
-        if (hoverSys === sys && intersecting === (hoverSys ? true : false)) return;
-        if (hoverSys) {
-            hoverSys.mesh.traverse(o => { if (o.isMesh) o.material.emissiveIntensity = 0; });
-        }
-        hoverSys = intersecting ? sys : null;
-        if (hoverSys) {
-            hoverSys.mesh.traverse(o => { if (o.isMesh) { o.material.emissive.setHex(hoverSys.color); o.material.emissiveIntensity = 0.9; } });
-            controls.autoRotate = false;
-        } else {
-            controls.autoRotate = true;
-        }
-    }
-    function showTooltip(sys, x, y) {
-        const el = document.getElementById('hudSysName');
-        if (el) el.textContent = sys.system + ' — нажмите, чтобы подобрать детали';
-        tooltip.style.display = 'block';
-        tooltip.style.left = (x + 16) + 'px';
-        tooltip.style.top = (y - 10) + 'px';
-    }
-    function hideTooltip() { tooltip.style.display = 'none'; setHover(null, false); }
-
-    renderer.domElement.addEventListener('pointermove', (e) => {
-        const rect = renderer.domElement.getBoundingClientRect();
-        pointer.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-        pointer.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
-        raycaster.setFromCamera(pointer, camera);
-        const hits = raycaster.intersectObjects(assemblies.map(a => a.mesh), true);
-        if (hits.length) {
-            let target = hits[0].object;
-            while (target && target.parent && target.parent !== group) target = target.parent;
-            const sys = assemblies.find(a => a.mesh === target || target.parent === a.mesh);
-            if (sys) {
-                setHover(sys, true);
-                const pos = new THREE.Vector3();
-                (hits[0].object).getWorldPosition(pos);
-                pos.project(camera);
-                const cx = (pos.x * 0.5 + 0.5) * rect.width + rect.left;
-                const cy = (1 - (pos.y * 0.5 + 0.5)) * rect.height + rect.top;
-                showTooltip(sys, cx, cy);
-                return;
-            }
-        }
-        hideTooltip();
-    });
-    renderer.domElement.addEventListener('click', () => {
-        if (hoverSys) {
-            const cat = hoverSys.category;
-            window.location.href = `catalog.html?category=${encodeURIComponent(cat)}`;
-        }
-    });
-
-    hud.querySelectorAll('.hud-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            hud.querySelectorAll('.hud-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            const layer = btn.getAttribute('data-layer');
-            assemblies.forEach(a => {
-                const show = layer === 'all' || layer === mapLayer(a.category);
-                a.mesh.traverse(o => { if (o.isMesh) o.visible = show; });
-            });
-            hideTooltip();
-        });
-    });
-    function mapLayer(cat) {
-        if (cat === 'engine') return 'engine';
-        if (cat === 'brakes') return 'brakes';
-        if (cat === 'chassis') return 'suspension';
-        if (cat === 'electrical') return 'electrical';
-        return 'all';
-    }
-
-    let raf;
-    function animate() {
-        raf = requestAnimationFrame(animate);
-        controls.update();
-        renderer.render(scene, camera);
-    }
-    animate();
-
-    const onResize = () => {
-        const w = container.clientWidth || 560, h = container.clientHeight || 340;
-        camera.aspect = w / h; camera.updateProjectionMatrix();
-        renderer.setSize(w, h);
-    };
-    window.addEventListener('resize', onResize);
-    return { dispose: () => { cancelAnimationFrame(raf); controls.dispose(); window.removeEventListener('resize', onResize); renderer.dispose(); scene.traverse(o => { if (o.geometry) o.geometry.dispose(); if (o.material) o.material.dispose(); }); } };
 }
 
+function initBlueprintExplorer() {
+    const stage = document.getElementById("blueprintStage");
+    const svg = document.querySelector(".blueprint-overlay");
+    const tooltip = document.getElementById("partTooltip");
+    const ttName = document.getElementById("ttName");
+    const ttLink = document.getElementById("ttLink");
+    const ttClose = document.getElementById("ttClose");
+    if (!stage || !svg || !tooltip) return;
+
+    svg.innerHTML = BLUEPRINT_PARTS.map(renderBlueprintPart).join("");
+
+    let activePartId = null;
+
+    function deactivatePart() {
+        if (!activePartId) return;
+        const g = document.querySelector(`.blueprint-part[data-part="${CSS.escape(activePartId)}"]`);
+        if (g) { g.classList.remove("active"); g.removeAttribute("transform"); }
+        tooltip.style.display = "none";
+        tooltip.hidden = true;
+        tooltip.setAttribute("aria-hidden", "true");
+        activePartId = null;
+    }
+
+    function showTooltip(id, sx, sy) {
+        const g = document.querySelector(`.blueprint-part[data-part="${CSS.escape(id)}"]`);
+        if (!g) return;
+        ttName.textContent = g.getAttribute("data-name");
+        const cat = g.getAttribute("data-category");
+        ttLink.href = cat ? `catalog.html?category=${encodeURIComponent(cat)}` : "catalog.html";
+        tooltip.style.display = "block";
+        tooltip.hidden = false;
+        tooltip.setAttribute("aria-hidden", "false");
+        const rect = tooltip.getBoundingClientRect();
+        const pad = 10;
+        let left = sx + 14;
+        let top = sy - 10;
+        const vpW = window.innerWidth;
+        const vpH = window.innerHeight;
+        if (left + rect.width > vpW - pad) left = vpW - rect.width - pad;
+        if (left < pad) left = pad;
+        if (top + rect.height > vpH - pad) top = vpH - rect.height - pad;
+        if (top < pad) top = pad;
+        tooltip.style.left = left + "px";
+        tooltip.style.top = top + "px";
+    }
+
+    function activatePart(id) {
+        if (activePartId === id) return;
+        deactivatePart();
+        const g = document.querySelector(`.blueprint-part[data-part="${CSS.escape(id)}"]`);
+        if (!g) return;
+        activePartId = id;
+        g.classList.add("active");
+        const bbox = g.getBBox();
+        const pt = svg.createSVGPoint();
+        pt.x = bbox.x + bbox.width / 2;
+        pt.y = bbox.y + bbox.height / 2;
+        const sp = pt.matrixTransform(g.getScreenCTM());
+        g.setAttribute("transform", `scale(1.22 ${pt.x} ${pt.y})`);
+        showTooltip(id, sp.x, sp.y);
+    }
+
+    svg.addEventListener("mouseenter", (e) => {
+        const g = e.target.closest(".blueprint-part");
+        if (g) activatePart(g.getAttribute("data-part"));
+    }, true);
+    svg.addEventListener("mouseleave", (e) => {
+        const g = e.target.closest(".blueprint-part");
+        const overTip = e.relatedTarget && e.relatedTarget.closest && e.relatedTarget.closest(".part-tooltip");
+        if (g && g.getAttribute("data-part") === activePartId && !overTip) deactivatePart();
+    }, true);
+    svg.addEventListener("click", (e) => {
+        const g = e.target.closest(".blueprint-part");
+        if (g) activatePart(g.getAttribute("data-part"));
+    });
+    svg.addEventListener("focusin", (e) => {
+        const g = e.target.closest(".blueprint-part");
+        if (g) activatePart(g.getAttribute("data-part"));
+    }, true);
+    svg.addEventListener("focusout", (e) => {
+        const g = e.target.closest(".blueprint-part");
+        if (g && g.getAttribute("data-part") === activePartId) deactivatePart();
+    }, true);
+
+    stage.addEventListener("click", (e) => {
+        if (!e.target.closest(".blueprint-part") && !e.target.closest(".part-tooltip")) deactivatePart();
+    });
+    stage.addEventListener("mouseleave", deactivatePart);
+    ttClose.addEventListener("click", deactivatePart);
+    window.addEventListener("resize", deactivatePart);
+}
 /* ==========================================================================
    17. GLOBAL INIT
    ========================================================================== */
@@ -1890,7 +1736,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initTheme();
     updateCartBadges();
     initIcons();
-    if (document.getElementById('hero3d')) initHero3D();
+    if (document.getElementById('blueprintStage')) initBlueprintExplorer();
     initCarSelector();
     initGarageSelector();
     initHeaderSearch();

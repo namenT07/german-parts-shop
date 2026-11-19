@@ -1593,141 +1593,494 @@ function renderFeatured() {
 }
 
 /* ==========================================================================
-   18. BLUEPRINT INTERACTIVE EXPLORER (статичный чертёж авто в профиль)
+   18. INTERACTIVE 3D CAR EXPLORER (Three.js, static side-profile model)
    ========================================================================== */
-/* Узлы автомобиля, нанесённые на чертёж. Каждый узел — свой цвет, своя категория каталога. */
-const BLUEPRINT_PARTS = [
-    { id: "front-bumper", name: "Передний бампер", category: "chassis", color: "#ef4444", type: "rect", x: 110, y: 350, w: 95, h: 85 },
-    { id: "headlight", name: "Фара", category: "optics", color: "#fbbf24", type: "ellipse", cx: 135, cy: 385, rx: 30, ry: 22 },
-    { id: "radiator", name: "Радиатор / интеркулер", category: "engine", color: "#06b6d4", type: "rect", x: 190, y: 365, w: 75, h: 40 },
-    { id: "engine-block", name: "Двигатель / впуск", category: "engine", color: "#a21caf", type: "rect", x: 205, y: 295, w: 155, h: 85 },
-    { id: "air-intake", name: "Воздушный фильтр", category: "engine", color: "#c084fc", type: "rect", x: 245, y: 325, w: 65, h: 45 },
-    { id: "suspension-front", name: "Стойка подвески", category: "chassis", color: "#10b981", type: "rect", x: 250, y: 330, w: 38, h: 130 },
-    { id: "brake-disc", name: "Тормозной диск", category: "brakes", color: "#f43f5e", type: "ellipse", cx: 270, cy: 414, rx: 44, ry: 47 },
-    { id: "brake-caliper", name: "Суппорт тормоза", category: "brakes", color: "#ec4899", type: "rect", x: 252, y: 395, w: 40, h: 30 },
-    { id: "wheel-front", name: "Передние колёса", category: "chassis", color: "#3b82f6", type: "ellipse", cx: 270, cy: 414, rx: 50, ry: 53 },
-    { id: "wheel-rear", name: "Задние колёса", category: "chassis", color: "#2563eb", type: "ellipse", cx: 742, cy: 414, rx: 50, ry: 53 },
-    { id: "exhaust", name: "Выпускная система", category: "engine", color: "#6b7280", type: "rect", x: 800, y: 438, w: 140, h: 22 },
-    { id: "door-front", name: "Передняя дверь", category: "chassis", color: "#14b8a6", type: "rect", x: 430, y: 298, w: 128, h: 142 },
-    { id: "door-rear", name: "Задняя дверь", category: "chassis", color: "#0ea5e9", type: "rect", x: 562, y: 298, w: 128, h: 142 },
-    { id: "window", name: "Окна салона", category: "chassis", color: "#22d3ee", type: "rect", x: 438, y: 228, w: 255, h: 115 },
-    { id: "seat", name: "Сиденья салона", category: "chassis", color: "#f472b6", type: "rect", x: 445, y: 328, w: 95, h: 85 },
-    { id: "steering-wheel", name: "Руль", category: "chassis", color: "#f97316", type: "circle", cx: 480, cy: 332, r: 20 },
-    { id: "rear-bumper", name: "Задний бампер", category: "chassis", color: "#dc2626", type: "rect", x: 825, y: 350, w: 135, h: 90 },
-    { id: "taillight", name: "Задний фонарь", category: "optics", color: "#facc15", type: "rect", x: 895, y: 360, w: 45, h: 28 }
-];
+/* Builds a detailed stylized 3D side-profile car from Three.js geometry,
+   proportioned to the reference blueprint. The car is strictly static
+   (no rotation / auto-spin); the camera is fixed so every part stays
+   predictable and easy to inspect. Dimension lines from the blueprint are
+   NOT reproduced anywhere in the 3D scene. */
+
+const CAR_PARTS = [];
+
+function hasWebGL() {
+    try {
+        const c = document.createElement('canvas');
+        return !!(window.WebGLRenderingContext && (c.getContext('webgl') || c.getContext('experimental-webgl')));
+    } catch (e) { return false; }
+}
+
+function mat(color, opts = {}) {
+    return new THREE.MeshStandardMaterial({
+        color,
+        roughness: opts.roughness !== undefined ? opts.roughness : 0.45,
+        metalness: opts.metalness !== undefined ? opts.metalness : 0.5,
+        emissive: opts.emissive || 0x000000,
+        emissiveIntensity: opts.emissiveIntensity || 0,
+        transparent: !!opts.transparent,
+        opacity: opts.opacity !== undefined ? opts.opacity : 1,
+        side: THREE.DoubleSide
+    });
+}
+
+// Distinct, high-visibility part colors
+const C = {
+    body: 0xc62828,           // deep red metallic body
+    bodyDark: 0xad1414,
+    window: 0x0d47a1,         // tinted glass
+    frontBumper: 0xd32f2f,
+    headlight: 0xffeb3b,      // amber
+    grille: 0x37474f,
+    glass: 0x22d3ee,
+    seat: 0x4caf50,           // green
+    steering: 0xff9800,       // orange
+    dash: 0x455a64,
+    engine: 0x9c27b0,         // purple
+    intake: 0xe040fb,         // magenta
+    radiator: 0x00bcd4,       // cyan
+    airFilter: 0xce93d8,
+    suspension: 0x00c853,
+    brakeRotor: 0xff5722,     // orange-red
+    brakeCaliper: 0xf50057,   // pink
+    rim: 0x2979ff,            // blue
+    tire: 0x1a1a1a,
+    exhaust: 0x616161,
+    muffler: 0x78909c,
+    rearBumper: 0xd32f2f,
+    taillight: 0xffd600,      // yellow
+    underbody: 0x37474f
+};
 
 function escHtml(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
 
-function renderBlueprintPart(p) {
-    let shape = "";
-    if (p.type === "rect") {
-        shape = `<rect x="${p.x}" y="${p.y}" width="${p.w}" height="${p.h}" fill="${p.color}" fill-opacity="0.92" />`;
-    } else if (p.type === "circle") {
-        shape = `<circle cx="${p.cx}" cy="${p.cy}" r="${p.r}" fill="${p.color}" fill-opacity="0.92" />`;
-    } else if (p.type === "ellipse") {
-        const fillOp = p.id.indexOf("wheel") === 0 ? 0.30 : 0.92;
-        shape = `<ellipse cx="${p.cx}" cy="${p.cy}" rx="${p.rx}" ry="${p.ry}" fill="${p.color}" fill-opacity="${fillOp}" stroke="${p.color}" stroke-width="3" />`;
-    }
-    return `
-        <g class="blueprint-part" data-part="${escHtml(p.id)}" data-name="${escHtml(p.name)}" data-category="${escHtml(p.category)}" role="button" tabindex="0" aria-label="${escHtml(p.name)}">
-            <title>${escHtml(p.name)}</title>
-            ${shape}
-        </g>
-    `;
+/* ---------- geometry helpers ---------- */
+function sideProfileShape() {
+    const s = new THREE.Shape();
+    // Car facing LEFT. X = length, Y = height. Front nose at x≈-2.9, rear at x≈+2.9.
+    s.moveTo(-2.9, -0.62);   // front bumper bottom
+    s.lineTo(-2.9, 0.28);    // front bumper top
+    s.lineTo(-2.55, 0.42);   // grille top
+    s.lineTo(-2.25, 0.86);   // hood start
+    s.lineTo(-1.30, 1.06);   // hood top / cowl
+    s.lineTo(-0.85, 1.72);   // windshield base
+    s.lineTo(-0.30, 2.05);   // roof front
+    s.lineTo(0.35, 2.18);    // roof top
+    s.lineTo(1.05, 2.18);    // roof mid
+    s.lineTo(1.60, 2.08);    // roof rear
+    s.lineTo(2.15, 1.62);    // rear window top
+    s.lineTo(2.45, 1.08);    // trunk lid top
+    s.lineTo(2.85, 0.42);    // rear bumper top
+    s.lineTo(2.85, -0.62);   // rear bumper bottom
+    s.lineTo(-2.9, -0.62);   // underbody back to front
+    return s;
 }
 
-function initBlueprintExplorer() {
-    const stage = document.getElementById("blueprintStage");
-    const svg = document.querySelector(".blueprint-overlay");
-    const tooltip = document.getElementById("partTooltip");
-    const ttName = document.getElementById("ttName");
-    const ttLink = document.getElementById("ttLink");
-    const ttClose = document.getElementById("ttClose");
-    if (!stage || !svg || !tooltip) return;
+/* ---------- part builder ---------- */
+/* Adds a mesh (or group child) as an interactive part. */
+function addPart(mesh, id, name, category, color, opts = {}) {
+    mesh.userData = { partId: id, partName: name, category, partColor: color, labelOffset: opts.labelOffset || new THREE.Vector3(0, 0.55, 0) };
+    mesh.name = id;
+    CAR_PARTS.push(mesh);
+    return mesh;
+}
 
-    svg.innerHTML = BLUEPRINT_PARTS.map(renderBlueprintPart).join("");
+function buildBody() {
+    const shape = sideProfileShape();
+    const extrudeSettings = { depth: 1.35, bevelEnabled: true, bevelThickness: 0.04, bevelSize: 0.03, bevelSegments: 3 };
+    const geo = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+    // Center the extruded geometry on Z=0 (front/back faces at ±depth/2)
+    geo.translate(0, 0, -0.675);
+    const mesh = new THREE.Mesh(geo, mat(C.body, { roughness: 0.35, metalness: 0.7 }));
+    addPart(mesh, 'body', 'Кузов автомобиля', 'chassis', C.body);
+    return mesh;
+}
 
-    let activePartId = null;
+function makeWindow(shapeFn, x, y, z, color, rotY = 0) {
+    // Generic window: thin extruded shape placed at given spot
+    const sh = new THREE.Shape();
+    sh.moveTo(-0.32, -0.30); sh.lineTo(0.32, -0.30); sh.lineTo(0.22, 0.30); sh.lineTo(-0.22, 0.30); sh.closePath();
+    const geo = new THREE.ExtrudeGeometry(sh, { depth: 0.06, bevelEnabled: false });
+    geo.translate(0, 0, -0.03);
+    const m = new THREE.Mesh(geo, mat(color, { transparent: true, opacity: 0.85 }));
+    m.position.set(x, y, z + 0.675); // sit on front face
+    if (rotY) m.rotation.y = rotY;
+    return m;
+}
 
-    function deactivatePart() {
-        if (!activePartId) return;
-        const g = document.querySelector(`.blueprint-part[data-part="${CSS.escape(activePartId)}"]`);
-        if (g) { g.classList.remove("active"); g.removeAttribute("transform"); }
-        tooltip.style.display = "none";
-        tooltip.hidden = true;
-        tooltip.setAttribute("aria-hidden", "true");
-        activePartId = null;
+function buildCar() {
+    const group = new THREE.Group();
+
+    // ---------- Body ----------
+    const body = buildBody();
+    group.add(body);
+
+    // ---------- Windows (cabin) ----------
+    const winMats = mat(C.window, { transparent: true, opacity: 0.8 });
+    // windshield + side windows as a set of tinted panes
+    const windshield = new THREE.Mesh(new THREE.ExtrudeGeometry(
+        (() => { const s = new THREE.Shape(); s.moveTo(-0.85,1.72); s.lineTo(-0.30,2.05); s.lineTo(0.05,2.12); s.lineTo(0.10,1.30); s.lineTo(-0.55,1.22); s.closePath(); })(), { depth: 0.05 }),
+        winMats);
+    windshield.position.set(-0.45, 1.65, 0.675);
+    addPart(windshield, 'windshield', 'Лобовое стекло', 'chassis', C.window);
+    group.add(windshield);
+
+    const sideWindow = new THREE.Mesh(new THREE.ExtrudeGeometry(
+        (() => { const s = new THREE.Shape(); s.moveTo(0.10,1.30); s.lineTo(0.10,1.92); s.lineTo(0.85,1.92); s.lineTo(0.85,1.30); s.closePath(); })(), { depth: 0.05 }),
+        winMats);
+    sideWindow.position.set(0.45, 1.6, 0.675);
+    addPart(sideWindow, 'sideWindow', 'Боковое стекло', 'chassis', C.window);
+    group.add(sideWindow);
+
+    const rearWindow = new THREE.Mesh(new THREE.ExtrudeGeometry(
+        (() => { const s = new THREE.Shape(); s.moveTo(0.85,1.30); s.lineTo(0.85,1.92); s.lineTo(2.15,1.62); s.lineTo(2.15,1.30); s.closePath(); })(), { depth: 0.05 }),
+        winMats);
+    rearWindow.position.set(1.5, 1.6, 0.675);
+    addPart(rearWindow, 'rearWindow', 'Заднее стекло', 'chassis', C.window);
+    group.add(rearWindow);
+
+    // ---------- Lights ----------
+    const headlight = new THREE.Mesh(new THREE.ExtrudeGeometry(
+        (() => { const s = new THREE.Shape(); s.moveTo(-2.55,0.42); s.lineTo(-2.25,0.42); s.lineTo(-2.25,0.10); s.lineTo(-2.55,0.10); s.closePath(); })(), { depth: 0.25 }),
+        mat(C.headlight));
+    headlight.position.set(-2.4, 0.28, 0.695);
+    addPart(headlight, 'headlight', 'Фара', 'optics', C.headlight);
+    group.add(headlight);
+
+    const taillight = new THREE.Mesh(new THREE.ExtrudeGeometry(
+        (() => { const s = new THREE.Shape(); s.moveTo(2.85,0.42); s.lineTo(2.55,0.42); s.lineTo(2.55,0.10); s.lineTo(2.85,0.10); s.closePath(); })(), { depth: 0.25 }),
+        mat(C.taillight));
+    taillight.position.set(2.7, 0.28, 0.695);
+    addPart(taillight, 'taillight', 'Задний фонарь', 'optics', C.taillight);
+    group.add(taillight);
+
+    // ---------- Grille ----------
+    const grille = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.30, 0.30), mat(C.grille));
+    grille.position.set(-2.42, 0.30, 0.72);
+    addPart(grille, 'grille', 'Решётка радиатора', 'chassis', C.grille);
+    group.add(grille);
+
+    // ---------- Bumpers ----------
+    const frontBumper = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.55, 1.30), mat(C.frontBumper));
+    frontBumper.position.set(-2.95, -0.30, 0);
+    addPart(frontBumper, 'frontBumper', 'Передний бампер', 'chassis', C.frontBumper);
+    group.add(frontBumper);
+
+    const rearBumper = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.55, 1.30), mat(C.rearBumper));
+    rearBumper.position.set(2.95, -0.30, 0);
+    addPart(rearBumper, 'rearBumper', 'Задний бампер', 'chassis', C.rearBumper);
+    group.add(rearBumper);
+
+    // ---------- Engine bay (front left) ----------
+    const engineBlock = new THREE.Mesh(new THREE.BoxGeometry(0.75, 0.62, 0.95), mat(C.engine));
+    engineBlock.position.set(-1.95, -0.10, 0.30);
+    addPart(engineBlock, 'engineBlock', 'Двигатель (блок)', 'engine', C.engine);
+    group.add(engineBlock);
+
+    const intake = new THREE.Mesh(new THREE.ExtrudeGeometry(
+        (() => { const s = new THREE.Shape(); s.moveTo(0,0); s.lineTo(0.45,0); s.lineTo(0.30,0.55); s.lineTo(0,0.55); s.closePath(); })(), { depth: 0.28 }),
+        mat(C.intake));
+    intake.position.set(-1.70, 0.55, 0.15); intake.rotation.z = Math.PI/4;
+    addPart(intake, 'intake', 'Впускной коллектор', 'engine', C.intake);
+    group.add(intake);
+
+    const radiator = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.50, 0.70), mat(C.radiator));
+    radiator.position.set(-2.28, 0.05, 0.20);
+    addPart(radiator, 'radiator', 'Радиатор / интеркулер', 'engine', C.radiator);
+    group.add(radiator);
+
+    const airFilter = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.18, 0.30, 16), mat(C.airFilter));
+    airFilter.position.set(-1.60, 0.85, 0.25);
+    addPart(airFilter, 'airFilter', 'Воздушный фильтр', 'engine', C.airFilter);
+    group.add(airFilter);
+
+    // ---------- Suspension & brakes (front wheel area) ----------
+    // Coilover strut
+    const strut = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 0.70, 16), mat(C.suspension));
+    strut.position.set(-1.05, -0.05, 0.35);
+    addPart(strut, 'suspension', 'Стойка подвески (коиловер)', 'chassis', C.suspension);
+    group.add(strut);
+
+    const spring = new THREE.Mesh(new THREE.TorusGeometry(0.16, 0.025, 12, 32), mat(C.suspension));
+    spring.rotation.x = Math.PI/2;
+    spring.position.set(-1.05, -0.25, 0.35);
+    addPart(spring, 'spring', 'Пружина подвески', 'chassis', C.suspension);
+    group.add(spring);
+
+    // Brake rotor + caliper
+    const rotor = new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.24, 0.06, 32), mat(C.brakeRotor));
+    rotor.rotation.z = Math.PI/2;
+    rotor.position.set(-1.10, -0.42, 0.72);
+    addPart(rotor, 'brakeRotor', 'Тормозной диск', 'brakes', C.brakeRotor);
+    group.add(rotor);
+
+    const caliper = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.16, 0.10), mat(C.brakeCaliper));
+    caliper.position.set(-1.22, -0.42, 0.70);
+    addPart(caliper, 'brakeCaliper', 'Тормозной суппорт', 'brakes', C.brakeCaliper);
+    group.add(caliper);
+
+    // ---------- Wheels ----------
+    function makeWheel(x) {
+        const g = new THREE.Group();
+        const tire = new THREE.Mesh(new THREE.CylinderGeometry(0.62, 0.62, 0.34, 40), mat(C.tire));
+        tire.rotation.z = Math.PI/2;
+        const rim = new THREE.Mesh(new THREE.CylinderGeometry(0.41, 0.41, 0.30, 40), mat(C.rim));
+        rim.rotation.z = Math.PI/2;
+        const hub = new THREE.Mesh(new THREE.CylinderGeometry(0.10, 0.10, 0.34, 16), mat(C.dash));
+        hub.rotation.z = Math.PI/2;
+        g.add(tire); g.add(rim); g.add(hub);
+        // 5 spokes
+        for (let i = 0; i < 5; i++) {
+            const a = (i / 5) * Math.PI * 2;
+            const sp = new THREE.Mesh(new THREE.BoxGeometry(0.018, 0.30, 0.06), mat(C.rim));
+            sp.position.set(Math.cos(a) * 0.18, Math.sin(a) * 0.18, 0);
+            sp.rotation.z = a;
+            g.add(sp);
+        }
+        g.position.set(x, -0.55, 0.72);
+        // register tire & rim as interactive parts that scale the whole group
+        const register = (m) => {
+            m.userData = { partId: `wheel-${x<0?'front':'rear'}`, partName: x<0?'Передние колёса':'Задние колёса', category: 'chassis', partColor: C.rim, targetGroup: g, labelOffset: new THREE.Vector3(0, -0.75, 0) };
+            m.name = m.userData.partId;
+            CAR_PARTS.push(m);
+        };
+        register(tire); register(rim);
+        group.add(g);
+        return g;
+    }
+    makeWheel(-1.05);
+    makeWheel(1.35);
+
+    // ---------- Exhaust (rear, underbody) ----------
+    const exhaustPipe = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.95, 16), mat(C.exhaust));
+    exhaustPipe.rotation.z = Math.PI/2;
+    exhaustPipe.position.set(1.05, -0.50, 0.10);
+    addPart(exhaustPipe, 'exhaust', 'Выпускная труба', 'engine', C.exhaust);
+    group.add(exhaustPipe);
+
+    const muffler = new THREE.Mesh(new THREE.BoxGeometry(0.50, 0.18, 0.24), mat(C.muffler));
+    muffler.position.set(1.95, -0.50, 0);
+    addPart(muffler, 'muffler', 'Глушитель', 'engine', C.muffler);
+    group.add(muffler);
+
+    // ---------- Interior ----------
+    const seatF = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.22, 0.55), mat(C.seat));
+    seatF.position.set(-0.10, -0.30, 0.30);
+    addPart(seatF, 'seat', 'Сиденье водителя', 'chassis', C.seat);
+    group.add(seatF);
+
+    const steering = new THREE.Mesh(new THREE.TorusGeometry(0.14, 0.025, 12, 32), mat(C.steering));
+    steering.rotation.x = Math.PI/2; steering.rotation.z = 0.35;
+    steering.position.set(-0.75, 0.62, 0.62);
+    addPart(steering, 'steering', 'Руль', 'chassis', C.steering);
+    group.add(steering);
+
+    const dash = new THREE.Mesh(new THREE.BoxGeometry(0.75, 0.18, 0.22), mat(C.dash));
+    dash.position.set(-1.05, 0.48, 0.62);
+    addPart(dash, 'dash', 'Панель приборов', 'chassis', C.dash);
+    group.add(dash);
+
+    // ---------- Spoiler ----------
+    const spoiler = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.10, 0.25), mat(C.bodyDark));
+    spoiler.position.set(2.30, 2.20, 0);
+    addPart(spoiler, 'spoiler', 'Спойлер', 'chassis', C.bodyDark);
+    group.add(spoiler);
+
+    return group;
+}
+
+/* ---------- init ---------- */
+function initCar3D() {
+    const container = document.getElementById('car3d');
+    if (!container) return;
+    if (!hasWebGL()) {
+        container.innerHTML = `
+            <div class="webgl3d-fallback" style="height:100%;width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:24px;color:var(--text-secondary);text-align:center;">
+                ${renderIcon('car', 48)}
+                <div style="font-size:14px;font-weight:700;color:var(--text-primary);">WebGL не поддерживается в этом браузере</div>
+                <div style="font-size:12px;max-width:260px;opacity:0.8;">Трёхмерный осмотр узлов автомобиля недоступен</div>
+            </div>`;
+        return;
+    }
+    container.style.position = 'relative';
+    container.style.overflow = 'hidden';
+
+    const scene = new THREE.Scene();
+    const W = container.clientWidth || 560, H = container.clientHeight || 340;
+    const camera = new THREE.PerspectiveCamera(42, W / H, 0.1, 60);
+    // Static side-three-quarter view of the car — no rotation / auto-spin
+    camera.position.set(0, 1.6, 6.6);
+    camera.lookAt(0, 0.15, 0);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
+    renderer.setSize(W, H);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.setClearColor(0x000000, 0);
+    renderer.domElement.style.position = 'absolute';
+    renderer.domElement.style.top = '0'; renderer.domElement.style.left = '0';
+    renderer.domElement.style.width = '100%'; renderer.domElement.style.height = '100%';
+    renderer.domElement.style.display = 'block';
+    container.appendChild(renderer.domElement);
+
+    const ambient = new THREE.AmbientLight(0xffffff, 0.55);
+    scene.add(ambient);
+    const key = new THREE.DirectionalLight(0xffffff, 0.95);
+    key.position.set(5, 9, 6);
+    scene.add(key);
+    const fill = new THREE.PointLight(0x2979ff, 0.5);
+    fill.position.set(-5, 1, 4);
+    scene.add(fill);
+    const rimLight = new THREE.PointLight(0xffeb3b, 0.4);
+    rimLight.position.set(5, 2, -4);
+    scene.add(rimLight);
+
+    const car = buildCar();
+    scene.add(car);
+
+    // Subtle ambient occlusion feel via a floor plane (very dark, transparent)
+    const floor = new THREE.Mesh(new THREE.PlaneGeometry(40, 40), new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.18 }));
+    floor.rotation.x = -Math.PI / 2;
+    floor.position.y = -1.15;
+    scene.add(floor);
+
+    const raycaster = new THREE.Raycaster();
+    const pointer = new THREE.Vector2();
+    const label = document.getElementById('car3d-label');
+    if (!label) {
+        const d = document.createElement('div');
+        d.id = 'car3d-label';
+        d.style.position = 'absolute';
+        d.style.pointerEvents = 'none';
+        d.style.zIndex = '20';
+        d.style.display = 'none';
+        d.style.padding = '8px 12px';
+        d.style.borderRadius = '10px';
+        d.style.background = 'rgba(6, 8, 12, 0.92)';
+        d.style.border = '1px solid var(--border-color)';
+        d.style.borderLeft = '4px solid var(--primary)';
+        d.style.color = '#fff';
+        d.style.fontSize = '13px';
+        d.style.fontWeight = '800';
+        d.style.whiteSpace = 'nowrap';
+        d.style.maxWidth = '210px';
+        d.style.textAlign = 'center';
+        d.style.boxShadow = 'var(--shadow-lg)';
+        d.style.transform = 'translate(-50%, -120%)';
+        container.appendChild(d);
+        label = d;
     }
 
-    function showTooltip(id, sx, sy) {
-        const g = document.querySelector(`.blueprint-part[data-part="${CSS.escape(id)}"]`);
-        if (!g) return;
-        ttName.textContent = g.getAttribute("data-name");
-        const cat = g.getAttribute("data-category");
-        ttLink.href = cat ? `catalog.html?category=${encodeURIComponent(cat)}` : "catalog.html";
-        tooltip.style.display = "block";
-        tooltip.hidden = false;
-        tooltip.setAttribute("aria-hidden", "false");
-        const rect = tooltip.getBoundingClientRect();
+    let hoverMesh = null;
+    let hoverTarget = null; // mesh to scale
+    let activeScale = 1;
+
+    function positionLabel(worldPos) {
+        const vec = worldPos.clone().project(camera);
+        const rect = container.getBoundingClientRect();
+        const cx = (vec.x * 0.5 + 0.5) * rect.width + rect.left;
+        const cy = (1 - (vec.y * 0.5 + 0.5)) * rect.height + rect.top;
         const pad = 10;
-        let left = sx + 14;
-        let top = sy - 10;
-        const vpW = window.innerWidth;
-        const vpH = window.innerHeight;
-        if (left + rect.width > vpW - pad) left = vpW - rect.width - pad;
-        if (left < pad) left = pad;
-        if (top + rect.height > vpH - pad) top = vpH - rect.height - pad;
-        if (top < pad) top = pad;
-        tooltip.style.left = left + "px";
-        tooltip.style.top = top + "px";
+        let left = cx;
+        let top = cy - 8;
+        const r = label.getBoundingClientRect();
+        if (left + r.width > rect.right - pad) left = rect.right - r.width - pad;
+        if (left < rect.left + pad) left = rect.left + pad;
+        if (top + r.height > rect.bottom - pad) top = rect.bottom - r.height - pad;
+        if (top < rect.top + pad) top = rect.top + pad;
+        label.style.left = left + 'px';
+        label.style.top = top + 'px';
     }
 
-    function activatePart(id) {
-        if (activePartId === id) return;
-        deactivatePart();
-        const g = document.querySelector(`.blueprint-part[data-part="${CSS.escape(id)}"]`);
-        if (!g) return;
-        activePartId = id;
-        g.classList.add("active");
-        const bbox = g.getBBox();
-        const pt = svg.createSVGPoint();
-        pt.x = bbox.x + bbox.width / 2;
-        pt.y = bbox.y + bbox.height / 2;
-        const sp = pt.matrixTransform(g.getScreenCTM());
-        g.setAttribute("transform", `scale(1.22 ${pt.x} ${pt.y})`);
-        showTooltip(id, sp.x, sp.y);
+    function showLabel(id, name, category, worldPos) {
+        label.textContent = escHtml(name);
+        const link = document.createElement('a');
+        link.href = category ? `catalog.html?category=${encodeURIComponent(category)}` : 'catalog.html';
+        link.textContent = 'Подобрать детали →';
+        link.style.display = 'block';
+        link.style.marginTop = '6px';
+        link.style.fontSize = '11px';
+        link.style.color = 'var(--primary)';
+        link.style.textDecoration = 'underline';
+        link.style.fontWeight = '700';
+        label.innerHTML = '';
+        label.appendChild(document.createTextNode(escHtml(name)));
+        const br = document.createElement('div'); br.style.height='4px'; label.appendChild(br);
+        label.appendChild(link);
+        label.style.display = 'block';
+        positionLabel(worldPos);
     }
 
-    svg.addEventListener("mouseenter", (e) => {
-        const g = e.target.closest(".blueprint-part");
-        if (g) activatePart(g.getAttribute("data-part"));
-    }, true);
-    svg.addEventListener("mouseleave", (e) => {
-        const g = e.target.closest(".blueprint-part");
-        const overTip = e.relatedTarget && e.relatedTarget.closest && e.relatedTarget.closest(".part-tooltip");
-        if (g && g.getAttribute("data-part") === activePartId && !overTip) deactivatePart();
-    }, true);
-    svg.addEventListener("click", (e) => {
-        const g = e.target.closest(".blueprint-part");
-        if (g) activatePart(g.getAttribute("data-part"));
-    });
-    svg.addEventListener("focusin", (e) => {
-        const g = e.target.closest(".blueprint-part");
-        if (g) activatePart(g.getAttribute("data-part"));
-    }, true);
-    svg.addEventListener("focusout", (e) => {
-        const g = e.target.closest(".blueprint-part");
-        if (g && g.getAttribute("data-part") === activePartId) deactivatePart();
-    }, true);
+    function hideLabel() { label.style.display = 'none'; }
 
-    stage.addEventListener("click", (e) => {
-        if (!e.target.closest(".blueprint-part") && !e.target.closest(".part-tooltip")) deactivatePart();
+    container.addEventListener('pointermove', (e) => {
+        const rect = renderer.domElement.getBoundingClientRect();
+        pointer.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+        pointer.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+        raycaster.setFromCamera(pointer, camera);
+        const hits = raycaster.intersectObjects(CAR_PARTS, false);
+        if (hits.length) {
+            const hit = hits[0].object;
+            const partId = hit.userData && hit.userData.partId;
+            const target = hit.userData && hit.userData.targetGroup ? hit.userData.targetGroup : hit;
+            if (hoverMesh !== hit) {
+                hoverMesh = hit;
+                hoverTarget = target;
+            }
+            const wp = new THREE.Vector3();
+            hit.getWorldPosition(wp);
+            // apply part color tint to label
+            showLabel(hit.userData.partId, hit.userData.partName, hit.userData.category, wp);
+        } else {
+            if (hoverMesh) { hoverMesh = null; hoverTarget = null; }
+            hideLabel();
+        }
     });
-    stage.addEventListener("mouseleave", deactivatePart);
-    ttClose.addEventListener("click", deactivatePart);
-    window.addEventListener("resize", deactivatePart);
+    container.addEventListener('pointerleave', () => { hoverMesh = null; hoverTarget = null; hideLabel(); });
+    container.addEventListener('click', () => {
+        if (hoverMesh && hoverMesh.userData) {
+            const cat = hoverMesh.userData.category;
+            window.location.href = cat ? `catalog.html?category=${encodeURIComponent(cat)}` : 'catalog.html';
+        }
+    });
+
+    // Smooth scale animation for the hovered part (no camera rotation)
+    let raf;
+    function animate() {
+        raf = requestAnimationFrame(animate);
+        const targetScale = (hoverTarget && hoverMesh) ? 1.14 : 1;
+        // lerp all hovered target; only one target at a time
+        if (hoverTarget) {
+            const s = hoverTarget.scale;
+            const step = 0.14;
+            s.x += (targetScale - s.x) * step;
+            s.y += (targetScale - s.y) * step;
+            s.z += (targetScale - s.z) * step;
+        }
+        renderer.render(scene, camera);
+    }
+    animate();
+
+    const onResize = () => {
+        const w = container.clientWidth || 560, h = container.clientHeight || 340;
+        camera.aspect = w / h;
+        camera.updateProjectionMatrix();
+        renderer.setSize(w, h);
+        hideLabel();
+    };
+    window.addEventListener('resize', onResize);
+
+    return {
+        dispose: () => {
+            cancelAnimationFrame(raf);
+            window.removeEventListener('resize', onResize);
+            renderer.dispose();
+            scene.traverse((o) => {
+                if (o.geometry) o.geometry.dispose();
+                if (o.material) o.material.dispose();
+            });
+        }
+    };
 }
+
 /* ==========================================================================
    17. GLOBAL INIT
    ========================================================================== */
@@ -1736,7 +2089,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initTheme();
     updateCartBadges();
     initIcons();
-    if (document.getElementById('blueprintStage')) initBlueprintExplorer();
+    if (document.getElementById('car3d')) initCar3D();
     initCarSelector();
     initGarageSelector();
     initHeaderSearch();

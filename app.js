@@ -659,22 +659,16 @@ function showToast(message, iconName = 'info') {
 /* ==========================================================================
    5. THEME
    ========================================================================== */
+// Light (flagship) theme is the default and only theme; kept for API compatibility
+// with HTML inline handlers. No dark-mode CSS is shipped.
 function initTheme() {
-    document.documentElement.setAttribute('data-theme', state.theme);
-    updateThemeToggleIcons(state.theme);
+    state.theme = 'light';
+    saveState();
 }
 function toggleTheme() {
-    state.theme = state.theme === 'light' ? 'dark' : 'light';
-    saveState();
-    initTheme();
-    showToast(`Переключено на ${state.theme === 'dark' ? 'тёмную' : 'светлую'} тему`, state.theme === 'dark' ? 'moon' : 'sun');
+    showToast('Одна светлая тема', 'info');
 }
-function updateThemeToggleIcons(theme) {
-    document.querySelectorAll('.theme-toggle-btn').forEach(btn => {
-        btn.innerHTML = renderIcon(theme === 'light' ? 'sun' : 'moon', 18);
-        btn.title = theme === 'light' ? 'Включить тёмную тему' : 'Включить светлую тему';
-    });
-}
+function updateThemeToggleIcons() {}
 
 /* ==========================================================================
    6. CART

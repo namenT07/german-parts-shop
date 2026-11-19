@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru" data-theme="dark">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,13 +12,12 @@
     <header>
         <div class="header-container">
             <a href="index.html" class="logo">
-                <span>German</span>Auto
+                <span>GERMAN</span>Auto
                 <span class="logo-badge">PRO</span>
             </a>
 
-            <!-- Мой гараж: быстрый селектор авто -->
             <div class="garage-selector" id="garageSelector" style="display:none;">
-                <div class="garage-badge" id="garageBadge" title="Сменить автомобиль" data-icon="car" data-size="14"><span>Нет авто</span></div>
+                <div class="garage-badge" id="garageBadge" title="Сменить автомобиль"><span data-icon="car" data-size="14"></span><span>Нет авто</span></div>
                 <div class="garage-dropdown" id="garageDropdown">
                     <select id="garageMake" class="select-custom"></select>
                     <select id="garageModel" class="select-custom" disabled></select>
@@ -33,25 +32,20 @@
             </div>
 
             <div class="header-search">
-                <span class="header-search-icon" data-icon="search"></span>
-                <input type="text" placeholder="Поиск по артикулу, названию, бренду или VIN..." class="header-search-input">
+                <span class="header-search-icon" data-icon="search" data-size="16"></span>
+                <input type="text" id="catalogSearchInput" placeholder="Поиск по артикулу, наименованию, бренду или VIN…" class="header-search-input">
                 <button class="btn-vin" onclick="openVINModal()" title="Подбор по VIN">VIN</button>
             </div>
 
             <div class="nav-actions">
                 <a href="index.html" class="nav-link active"><span data-icon="home" data-size="16"></span> Главная</a>
                 <a href="catalog.html" class="nav-link"><span data-icon="folder" data-size="16"></span> Каталог</a>
-                <button class="theme-toggle-btn" onclick="toggleTheme()" title="Переключить тему" data-icon="sun" data-size="16"></button>
-                <a href="cart.html" class="cart-nav-btn">
-                    <span data-icon="shopping-cart" data-size="16"></span> Корзина
-                    <span class="cart-badge">0</span>
-                </a>
+                <a href="cart.html" class="cart-nav-btn"><span data-icon="shopping-cart" data-size="16"></span> Корзина<span class="cart-badge">0</span></a>
             </div>
         </div>
 
-        <!-- Баннер выбранного авто -->
         <div class="garage-banner" id="garageBanner">
-            <span class="garage-banner-icon" data-icon="car" data-size="16"></span>
+            <span class="garage-banner-icon" data-icon="car" data-size="15"></span>
             <span id="garageBannerText">Подбор по авто</span>
             <button class="garage-banner-close" onclick="document.getElementById('garageSelector').style.display='flex'; document.getElementById('garageBanner').style.display='none';">×</button>
         </div>
@@ -94,7 +88,7 @@
                         </div>
                         <div class="control-group">
                             <label class="control-label">03. Год / Кузов</label>
-                            <div class="select-wrapper"><select id="genSelect" class="select-custom" disabled><option value="">Год / Поколение</option></select></div>
+                            <div class="select-wrapper"><select id="genSelect" class="select-custom" disabled><option value="">Год / Кузов</option></select></div>
                         </div>
                         <div class="control-group">
                             <label class="control-label">&nbsp;</label>
@@ -109,7 +103,7 @@
                         </div>
                         <div class="control-group">
                             <label class="control-label">&nbsp;</label>
-                            <button class="btn-primary" onclick="submitHeroVIN()"><span>Найти по VIN</span><span data-icon="search" data-size="16" style="margin-left:6px; display:inline-block;"></span></button>
+                            <button class="btn-primary" onclick="submitHeroVIN()"><span>Найти по VIN</span><span data-icon="search" data-size="14" style="margin-left:7px;"></span></button>
                         </div>
                     </div>
                 </div>
@@ -127,12 +121,12 @@
                 <a href="catalog.html" class="section-link">Смотреть весь каталог →</a>
             </div>
             <div class="categories-grid">
-                <a href="catalog.html" class="category-card"><div class="category-icon" data-icon="cog" data-size="28"></div><div class="category-info"><h3>Двигатель и ГРМ</h3><p>Цепи, ремни, поршни, клапаны и прокладки</p></div></a>
-                <a href="catalog.html" class="category-card"><div class="category-icon" data-icon="disc" data-size="28"></div><div class="category-info"><h3>Тормозная система</h3><p>Диски, керамоколодки, суппорты и датчики</p></div></a>
-                <a href="catalog.html" class="category-card"><div class="category-icon" data-icon="wheel" data-size="28"></div><div class="category-info"><h3>Подвеска и рулевое</h3><p>Амортизаторы, рычаги, сайлентблоки</p></div></a>
-                <a href="catalog.html" class="category-card"><div class="category-icon" data-icon="oil-filter" data-size="28"></div><div class="category-info"><h3>Фильтры и Масла</h3><p>Масляные, воздушные, салонные и масляные составы</p></div></a>
-                <a href="catalog.html" class="category-card"><div class="category-icon" data-icon="lamp" data-size="28"></div><div class="category-info"><h3>Оптика и Освещение</h3><p>Adaptive LED, Laser headlights, блочные модули</p></div></a>
-                <a href="catalog.html" class="category-card"><div class="category-icon" data-icon="plug" data-size="28"></div><div class="category-info"><h3>Электроника и Датчики</h3><p>Датчики ABS, блоки управления, свечи зажигания</p></div></a>
+                <a href="catalog.html" class="category-card"><div class="category-icon" data-icon="cog" data-size="22"></div><div class="category-info"><h3>Двигатель и ГРМ</h3><p>Цепи, ремни, поршни, клапаны и прокладки</p></div></a>
+                <a href="catalog.html" class="category-card"><div class="category-icon" data-icon="disc" data-size="22"></div><div class="category-info"><h3>Тормозная система</h3><p>Диски, керамоколодки, суппорты и датчики</p></div></a>
+                <a href="catalog.html" class="category-card"><div class="category-icon" data-icon="wheel" data-size="22"></div><div class="category-info"><h3>Подвеска и рулевое</h3><p>Амортизаторы, рычаги, сайлентблоки</p></div></a>
+                <a href="catalog.html" class="category-card"><div class="category-icon" data-icon="oil-filter" data-size="22"></div><div class="category-info"><h3>Фильтры и Масла</h3><p>Масляные, воздушные, салонные и масляные составы</p></div></a>
+                <a href="catalog.html" class="category-card"><div class="category-icon" data-icon="lamp" data-size="22"></div><div class="category-info"><h3>Оптика и Освещение</h3><p>Adaptive LED, Laser headlights, блочные модули</p></div></a>
+                <a href="catalog.html" class="category-card"><div class="category-icon" data-icon="plug" data-size="22"></div><div class="category-info"><h3>Электроника и Датчики</h3><p>Датчики ABS, блоки управления, свечи зажигания</p></div></a>
             </div>
         </section>
 
@@ -153,7 +147,7 @@
     <footer>
         <div class="footer-container">
             <div class="footer-brand">
-                <a href="index.html" class="logo"><span>German</span>Auto</a>
+                <a href="index.html" class="logo"><span>GERMAN</span>Auto</a>
                 <p class="footer-desc">Флагманская онлайн-платформа подбора и поставки премиальных автокомпонентов для автомобилей Audi, BMW, Mercedes-Benz, Porsche и Volkswagen.</p>
             </div>
             <div class="footer-col">
@@ -193,7 +187,6 @@
         <a href="index.html" class="mobile-tab-item active"><span class="mobile-tab-icon" data-icon="home" data-size="20"></span><span>Главная</span></a>
         <a href="catalog.html" class="mobile-tab-item"><span class="mobile-tab-icon" data-icon="folder" data-size="20"></span><span>Каталог</span></a>
         <a href="cart.html" class="mobile-tab-item"><span class="mobile-tab-icon" data-icon="shopping-cart" data-size="20"></span><span>Корзина</span></a>
-        <button class="mobile-tab-item theme-toggle-btn" style="background:none; border:none; padding:0;" onclick="toggleTheme()"><span class="mobile-tab-icon" data-icon="sun" data-size="20"></span><span>Тема</span></button>
     </nav>
 
     <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>

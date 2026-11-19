@@ -1661,87 +1661,73 @@ footer {
 /* VIN modal result already handled inline */
 
 /* ==========================================================================
-   BLUEPRINT INTERACTIVE EXPLORER (статичный чертёж авто в профиль)
+   INTERACTIVE 3D CAR HERO (Three.js, static side-profile model)
    ========================================================================== */
-.blueprint-stage {
+.hero-visual {
     position: relative;
     width: 100%;
     max-width: 1000px;
     margin: 24px auto 0 auto;
     border: 1px solid var(--border-color);
     border-radius: var(--radius-xl);
-    background: #0b101a;
+    background: #07090d;
+    overflow: hidden;
     display: block;
 }
-.blueprint-base {
-    width: 100%;
-    height: auto;
-    display: block;
-}
-.blueprint-overlay {
+@media (min-width: 1024px) { .hero-visual { min-height: 470px; } }
+.hero-visual #car3d {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
     display: block;
+    background: #07090d;
 }
-.blueprint-part {
-    cursor: pointer;
-    transition: transform 0.22s cubic-bezier(0.4, 0, 0.2, 1), filter 0.22s;
-    outline: none;
-    pointer-events: auto;
-}
-.blueprint-part:focus {
-    filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.45));
-}
-.part-tooltip {
-    position: fixed;
-    z-index: 60;
+/* Part label rendered as HTML over the canvas */
+#car3d-label {
+    position: absolute;
+    pointer-events: none;
+    z-index: 20;
     display: none;
-    max-width: 220px;
-    padding: 10px 14px;
-    border-radius: var(--radius-md);
-    background: var(--bg-card);
+    padding: 9px 13px;
+    border-radius: 12px;
+    background: rgba(6, 8, 12, 0.93);
     border: 1px solid var(--border-color);
     border-left: 4px solid var(--primary);
-    color: var(--text-primary);
-    box-shadow: var(--shadow-lg);
+    color: #fff;
     font-size: 13px;
-    pointer-events: auto;
-}
-#ttName {
-    display: block;
     font-weight: 800;
-    color: var(--primary);
-    margin-bottom: 6px;
+    white-space: nowrap;
+    max-width: 210px;
+    text-align: center;
+    box-shadow: var(--shadow-lg);
+    transform: translate(-50%, -120%);
 }
-#ttLink {
-    display: inline-block;
-    color: var(--text-secondary);
-    font-size: 12px;
+#car3d-label a {
+    display: block;
+    margin-top: 7px;
+    font-size: 11.5px;
+    color: var(--primary);
     text-decoration: underline;
-    margin-bottom: 6px;
+    font-weight: 800;
 }
-#ttLink:hover {
-    color: var(--primary);
-}
-.tt-close {
+#car3d-label a:hover { color: #ef4444; }
+.webgl3d-fallback {
     position: absolute;
-    top: 6px;
-    right: 8px;
-    background: transparent;
-    border: none;
-    color: var(--text-muted);
-    font-size: 20px;
-    line-height: 1;
-    cursor: pointer;
-    padding: 2px 6px;
-    border-radius: var(--radius-sm);
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 24px;
+    color: var(--text-secondary);
+    text-align: center;
+    background: #07090d;
 }
-.tt-close:hover {
-    color: var(--text-primary);
-    background: var(--bg-elevated);
-}
+
 
 /* ==========================================================================
    VECTOR ICONS & PART IMAGES
